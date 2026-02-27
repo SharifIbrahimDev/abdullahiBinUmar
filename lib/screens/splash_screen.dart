@@ -48,7 +48,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             child: Opacity(
               opacity: 0.1,
               child: Image.asset(
-                'assets/images/bin_umar.jpg', // Using reciter image as subtle background
+                'assets/images/bin_umar.jpg', // Using sheikh image as subtle background
                 fit: BoxFit.cover,
               ),
             ),

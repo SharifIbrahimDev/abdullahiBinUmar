@@ -5,6 +5,8 @@ import '../data/books_data.dart';
 import '../widgets/mini_player.dart';
 import 'lessons_screen.dart';
 import '../widgets/app_drawer.dart';
+import '../constants/app_colors.dart';
+
 
 class BooksScreen extends StatefulWidget {
   const BooksScreen({super.key});
@@ -28,54 +30,72 @@ class _BooksScreenState extends State<BooksScreen> {
     return Scaffold(
       drawer: const AppDrawer(),
       body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
         slivers: [
           SliverAppBar(
-            expandedHeight: 120.0,
-            floating: true,
+            expandedHeight: 160.0,
+            floating: false,
             pinned: true,
             centerTitle: true,
             elevation: 0,
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            backgroundColor: AppColors.surfaceWhite,
             flexibleSpace: FlexibleSpaceBar(
               centerTitle: true,
+              titlePadding: const EdgeInsets.symmetric(vertical: 16),
               title: Text(
-                "Islamic Audio Library",
+                "Bin Umar Library",
                 style: GoogleFonts.outfit(
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                  fontSize: 18,
+                  color: AppColors.primaryGreen,
+                  fontSize: 22,
                 ),
               ),
-              background: Container(color: Theme.of(context).scaffoldBackgroundColor),
+              background: Container(
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceWhite,
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      AppColors.primaryGreen.withValues(alpha: 0.05),
+                      AppColors.surfaceWhite,
+                    ],
+                  ),
+                ),
+              ),
             ),
             actions: [
-               IconButton(
-                onPressed: () {
-                  // TODO: Implement search dialog or toggle
-                },
-                icon: const Icon(Icons.search, color: Colors.black87),
+              Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.search_rounded, size: 28),
+                ),
               ),
             ],
           ),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                   Text(
+                  Text(
                     "Assalamu Alaikum",
-                    style: GoogleFonts.outfit(
+                    style: GoogleFonts.inter(
                       fontSize: 14,
-                      color: Colors.grey[600],
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black38,
+                      letterSpacing: 1.1,
                     ),
                   ),
+                  const SizedBox(height: 4),
                   Text(
-                    "Explore the Knowledge",
-                    style: GoogleFonts.outfit(
-                      fontSize: 24,
+                   "Bismillahir Rahmanir Rahim",
+                    style: GoogleFonts.amiri(
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF1B5E20),
+                      color: AppColors.accentGold,
                     ),
                   ),
                 ],
@@ -83,28 +103,15 @@ class _BooksScreenState extends State<BooksScreen> {
             ),
           ),
           SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 24),
             sliver: SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
                   final book = filteredBooks[index];
                   return Container(
                     margin: const EdgeInsets.only(bottom: 20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF1B5E20).withValues(alpha: 0.05),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
+                    child: Card(
                       child: InkWell(
-                        borderRadius: BorderRadius.circular(24),
                         onTap: () {
                           Navigator.push(
                             context,
@@ -114,21 +121,21 @@ class _BooksScreenState extends State<BooksScreen> {
                           );
                         },
                         child: Padding(
-                          padding: const EdgeInsets.all(20.0),
+                          padding: const EdgeInsets.all(16.0),
                           child: Row(
                             children: [
                               Hero(
                                 tag: 'book_${book.id}',
                                 child: Container(
-                                  width: 80,
-                                  height: 110,
+                                  width: 85,
+                                  height: 120,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(16),
                                     boxShadow: [
                                       BoxShadow(
                                         color: Colors.black.withValues(alpha: 0.1),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 4),
+                                        blurRadius: 15,
+                                        offset: const Offset(4, 8),
                                       ),
                                     ],
                                     image: const DecorationImage(
@@ -149,36 +156,38 @@ class _BooksScreenState extends State<BooksScreen> {
                                         fontWeight: FontWeight.bold,
                                         fontSize: 18,
                                         color: Colors.black87,
+                                        height: 1.2,
                                       ),
                                     ),
-                                    const SizedBox(height: 4),
+                                    const SizedBox(height: 6),
                                     Text(
                                       book.titleAr,
                                       textDirection: TextDirection.rtl,
                                       style: GoogleFonts.amiri(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                        color: const Color(0xFFC5A059),
+                                        fontSize: 17,
+                                        color: AppColors.accentGold,
                                       ),
                                     ),
-                                    const SizedBox(height: 12),
+                                    const SizedBox(height: 16),
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFF1B5E20).withValues(alpha: 0.1),
-                                        borderRadius: BorderRadius.circular(8),
+                                        color: AppColors.primaryGreen.withValues(alpha: 0.08),
+                                        borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          const Icon(Icons.play_circle_outline, size: 14, color: Color(0xFF1B5E20)),
-                                          const SizedBox(width: 4),
+                                          Icon(Icons.playlist_play_rounded, size: 16, color: AppColors.primaryGreen),
+                                          const SizedBox(width: 6),
                                           Text(
                                             "${book.lessonCount} Lessons",
                                             style: GoogleFonts.inter(
-                                              color: const Color(0xFF1B5E20),
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w600,
+                                              color: AppColors.primaryGreen,
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                              letterSpacing: 0.5,
                                             ),
                                           ),
                                         ],
@@ -187,6 +196,7 @@ class _BooksScreenState extends State<BooksScreen> {
                                   ],
                                 ),
                               ),
+                              Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey.withValues(alpha: 0.3)),
                             ],
                           ),
                         ),
@@ -198,7 +208,7 @@ class _BooksScreenState extends State<BooksScreen> {
               ),
             ),
           ),
-          const SliverToBoxAdapter(child: SizedBox(height: 100)),
+          const SliverToBoxAdapter(child: SizedBox(height: 120)),
         ],
       ),
       bottomNavigationBar: const MiniPlayer(),

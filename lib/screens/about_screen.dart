@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../constants/app_colors.dart';
+
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
@@ -7,18 +11,19 @@ class AboutScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceWhite,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF1B5E20)),
+          icon: Icon(Icons.arrow_back_ios_new, color: AppColors.primaryGreen),
           onPressed: () => Navigator.pop(context),
         ),
+        iconTheme: IconThemeData(color: AppColors.primaryGreen),
         title: Text(
-          "About Reciter",
-          style: GoogleFonts.amiri(
-            color: const Color(0xFF1B5E20),
+          "About Sheikh",
+          style: GoogleFonts.outfit(
+            color: AppColors.primaryGreen,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -29,20 +34,20 @@ class AboutScreen extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              width: 120,
-              height: 120,
+              width: 140,
+              height: 140,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xFFFFD700), width: 4),
+                border: Border.all(color: AppColors.accentGold, width: 4),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 30,
+                    offset: const Offset(0, 15),
                   ),
                 ],
                 image: const DecorationImage(
-                  image: AssetImage('assets/images/bin_umar.jpg'),
+                  image: AssetImage('assets/images/abdullah.jpg'),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -52,18 +57,26 @@ class AboutScreen extends StatelessWidget {
               "Sheikh Abdullahi Bin Umar",
               textAlign: TextAlign.center,
               style: GoogleFonts.amiri(
-                fontSize: 28,
+                fontSize: 30,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF1B5E20),
+                color: AppColors.primaryGreen,
               ),
             ),
             const SizedBox(height: 8),
-            Text(
-              "Malamin Addini & Mai Wa'azi",
-              style: GoogleFonts.lato(
-                fontSize: 16,
-                color: Colors.grey[600],
-                letterSpacing: 0.5,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              decoration: BoxDecoration(
+                color: AppColors.primaryGreen.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                "Malamin Addini & Mai Wa'azi",
+                style: GoogleFonts.lato(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primaryGreen,
+                  letterSpacing: 0.5,
+                ),
               ),
             ),
             const SizedBox(height: 40),
@@ -71,11 +84,48 @@ class AboutScreen extends StatelessWidget {
               title: "Biography",
               content: "Sheikh Abdullahi Bin Umar is a renowned Islamic scholar dedicated to teaching the Quran and Hadith. His explanations of classical texts like 'Sharhu Ilalit Tirmizi' and 'Usulu Riwayati Qalun' have benefited thousands of students.",
             ),
-            const SizedBox(height: 16),
-             _buildInfoCard(
-              title: "His Mission",
-              content: "To spread authentic Islamic knowledge through clear, accessible, and profound teaching methods that resonate with learners of all levels.",
+            const SizedBox(height: 24),
+            Text(
+              "Contact Sheikh",
+              style: GoogleFonts.outfit(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primaryGreen,
+              ),
             ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildSocialButton(
+                    icon: Icons.phone_rounded,
+                    onTap: () => _launchUrl('tel:08060698938'),
+                  ),
+                  _buildSocialButton(
+                    icon: FontAwesomeIcons.whatsapp,
+                    iconColor: const Color(0xFF25D366),
+                    onTap: () => _launchUrl('https://wa.me/2348060698938'),
+                  ),
+                  _buildSocialButton(
+                    icon: Icons.email_outlined,
+                    onTap: () => _launchUrl('mailto:abdullahibinumar88@gmail.com'),
+                  ),
+                  _buildSocialButton(
+                    icon: FontAwesomeIcons.whatsapp,
+                    iconColor: AppColors.accentGold, // Different shade for group
+                    onTap: () => _launchUrl('https://chat.whatsapp.com/Kt82MeRsICxFsCF7BJky8t'),
+                  ),
+                  _buildSocialButton(
+                    icon: FontAwesomeIcons.telegram,
+                    iconColor: const Color(0xFF0088CC),
+                    onTap: () => _launchUrl('https://t.me/sharhushadibiyyah'),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 48),
           ],
         ),
       ),
@@ -87,32 +137,73 @@ class AboutScreen extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFFF9F9F9),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.grey.withOpacity(0.08)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
-            style: GoogleFonts.lato(
+            style: GoogleFonts.outfit(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF2E7D32),
+              color: AppColors.primaryGreen,
             ),
           ),
           const SizedBox(height: 12),
           Text(
             content,
-            style: GoogleFonts.lato(
+            style: GoogleFonts.inter(
               fontSize: 15,
               height: 1.6,
-              color: Colors.grey[800],
+              color: Colors.black87,
             ),
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildSocialButton({
+    required IconData icon,
+    required VoidCallback onTap,
+    Color? iconColor,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 54,
+        height: 54,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: (iconColor ?? AppColors.primaryGreen).withOpacity(0.12),
+              blurRadius: 15,
+              offset: const Offset(0, 6),
+            ),
+          ],
+          border: Border.all(color: Colors.grey.withOpacity(0.1)),
+        ),
+        child: Icon(icon, color: iconColor ?? AppColors.primaryGreen, size: 24),
+      ),
+    );
+  }
+
+  Future<void> _launchUrl(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+       debugPrint("Could not launch $url");
+    }
   }
 }

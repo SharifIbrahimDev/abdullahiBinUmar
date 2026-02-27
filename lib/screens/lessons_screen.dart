@@ -5,7 +5,9 @@ import '../models/lesson.dart';
 import '../data/books_data.dart';
 import '../widgets/lesson_tile.dart';
 import '../services/audio_service.dart';
-import '../widgets/mini_player.dart'; // Import to access notifier
+import '../widgets/mini_player.dart';
+import '../constants/app_colors.dart';
+
 
 class LessonsScreen extends StatelessWidget {
   final Book book;
@@ -18,15 +20,27 @@ class LessonsScreen extends StatelessWidget {
 
     return Scaffold(
       body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
         slivers: [
           SliverAppBar(
-            expandedHeight: 240.0,
+            expandedHeight: 320.0,
             pinned: true,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-              onPressed: () => Navigator.pop(context),
+            stretch: true,
+            leading: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: CircleAvatar(
+                backgroundColor: Colors.black26,
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ),
             ),
             flexibleSpace: FlexibleSpaceBar(
+              stretchModes: const [
+                StretchMode.zoomBackground,
+                StretchMode.blurBackground,
+              ],
               title: Text(
                 book.title,
                 style: GoogleFonts.outfit(
@@ -38,7 +52,7 @@ class LessonsScreen extends StatelessWidget {
               background: Stack(
                 fit: StackFit.expand,
                 children: [
-                   Hero(
+                  Hero(
                     tag: 'book_${book.id}',
                     child: Image.asset(
                       'assets/images/bin_umar.jpg',
@@ -52,13 +66,13 @@ class LessonsScreen extends StatelessWidget {
                         end: Alignment.bottomCenter,
                         colors: [
                           Colors.transparent,
-                          Colors.black87,
+                          Colors.black,
                         ],
                       ),
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 60),
+                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 70),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,20 +80,21 @@ class LessonsScreen extends StatelessWidget {
                         Text(
                           book.titleAr,
                           style: GoogleFonts.amiri(
-                            color: const Color(0xFFC5A059),
-                            fontSize: 20,
+                            color: AppColors.accentGold,
+                            fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
                           textDirection: TextDirection.rtl,
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 8),
                         Text(
                           book.description,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.inter(
-                            color: Colors.white70,
-                            fontSize: 13,
+                            color: Colors.white.withValues(alpha: 0.7),
+                            fontSize: 14,
+                            height: 1.4,
                           ),
                         ),
                       ],
@@ -90,32 +105,55 @@ class LessonsScreen extends StatelessWidget {
             ),
           ),
           SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+              ),
               child: Row(
                 children: [
-                  Text(
-                    "Available Lessons",
-                    style: GoogleFonts.outfit(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Audio Lessons",
+                        style: GoogleFonts.outfit(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        "Curated playlist for this book",
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: Colors.black38,
+                        ),
+                      ),
+                    ],
                   ),
                   const Spacer(),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1B5E20).withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(20),
+                      color: AppColors.primaryGreen.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    child: Text(
-                      "${lessons.length} Parts",
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF1B5E20),
-                      ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.library_music_rounded, size: 14, color: AppColors.primaryGreen),
+                        const SizedBox(width: 8),
+                        Text(
+                          "${lessons.length} Parts",
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryGreen,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -125,25 +163,28 @@ class LessonsScreen extends StatelessWidget {
           ValueListenableBuilder<String?>(
             valueListenable: audioService.currentPathNotifier,
             builder: (context, currentPath, child) {
-              return SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final lesson = lessons[index];
-                    final isPlaying = currentPath == lesson.audioPath;
+              return SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final lesson = lessons[index];
+                      final isPlaying = currentPath == lesson.audioPath;
 
-                    return LessonTile(
-                      lesson: lesson,
-                      allLessons: lessons,
-                      index: index,
-                      isPlaying: isPlaying,
-                    );
-                  },
-                  childCount: lessons.length,
+                      return LessonTile(
+                        lesson: lesson,
+                        allLessons: lessons,
+                        index: index,
+                        isPlaying: isPlaying,
+                      );
+                    },
+                    childCount: lessons.length,
+                  ),
                 ),
               );
             },
           ),
-          const SliverToBoxAdapter(child: SizedBox(height: 100)),
+          const SliverToBoxAdapter(child: SizedBox(height: 120)),
         ],
       ),
       bottomNavigationBar: const MiniPlayer(),

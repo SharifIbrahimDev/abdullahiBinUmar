@@ -4,11 +4,12 @@ import 'package:provider/provider.dart';
 import '../models/lesson.dart';
 import '../screens/player_screen.dart';
 import '../providers/player_provider.dart';
+import '../constants/app_colors.dart';
 
 class LessonTile extends StatelessWidget {
   final Lesson lesson;
-  final List<Lesson> allLessons;       // ← NEW: Full list of lessons in the book
-  final int index;                     // ← NEW: This lesson's position in the list
+  final List<Lesson> allLessons;
+  final int index;
   final bool isPlaying;
 
   const LessonTile({
@@ -34,14 +35,14 @@ class LessonTile extends StatelessWidget {
         final isActive = isPlaying || (provider.currentLesson?.id == lesson.id);
         
         return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
-            border: isActive ? Border.all(color: const Color(0xFF1B5E20), width: 1.5) : null,
+            border: isActive ? Border.all(color: AppColors.primaryGreen, width: 1.5) : null,
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF1B5E20).withValues(alpha: 0.05),
+                color: AppColors.primaryGreen.withOpacity(0.05),
                 blurRadius: 15,
                 offset: const Offset(0, 5),
               ),
@@ -54,11 +55,18 @@ class LessonTile extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => PlayerScreen(
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) => PlayerScreen(
                       lessons: allLessons,
                       initialIndex: index,
                     ),
+                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                      const begin = Offset(0.0, 1.0);
+                      const end = Offset.zero;
+                      const curve = Curves.easeOutCubic;
+                      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                      return SlideTransition(position: animation.drive(tween), child: child);
+                    },
                   ),
                 );
               },
@@ -66,12 +74,11 @@ class LessonTile extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Row(
                   children: [
-                    // Lesson Number with better styling
                     Container(
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: isActive ? const Color(0xFF1B5E20) : const Color(0xFFF5F5F5),
+                        color: isActive ? AppColors.primaryGreen : AppColors.surfaceWhite,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Center(
@@ -86,7 +93,6 @@ class LessonTile extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 16),
-                    // Titles
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,7 +112,7 @@ class LessonTile extends StatelessWidget {
                             style: GoogleFonts.amiri(
                               fontWeight: FontWeight.w600,
                               fontSize: 15,
-                              color: isActive ? const Color(0xFFC5A059) : Colors.black54,
+                              color: isActive ? AppColors.accentGold : Colors.black54,
                             ),
                           ),
                           const SizedBox(height: 6),
@@ -127,10 +133,9 @@ class LessonTile extends StatelessWidget {
                         ],
                       ),
                     ),
-                    // Action Icon
                     Icon(
                       isPlaying ? Icons.pause_circle_filled_rounded : Icons.play_circle_filled_rounded,
-                      color: const Color(0xFF1B5E20),
+                      color: AppColors.primaryGreen,
                       size: 40,
                     ),
                   ],

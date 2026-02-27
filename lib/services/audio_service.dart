@@ -10,7 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/lesson.dart';
 
 // ... (baseAudioUrl)
-const String baseAudioUrl = 'https://raw.githubusercontent.com/SharifIbrahimDev/abdullahiBinUmar/main/';
+const String baseAudioUrl = 'https://raw.githubusercontent.com/SharifIbrahimDev/abdullahiBinUmar/incremental-final/';
 
 class AudioService {
   final AudioPlayer _player = AudioPlayer();
@@ -62,7 +62,7 @@ class AudioService {
         }
         await _player.setAudioSource(AudioSource.asset(effectivePath));
       } else {
-        final remoteUrl = '$baseAudioUrl${lesson.audioPath}';
+        final remoteUrl = Uri.encodeFull('$baseAudioUrl${lesson.audioPath}').replaceAll("'", "%27");
         
         debugPrint('🔍 Requested URL: $remoteUrl'); // Debug #1
 
