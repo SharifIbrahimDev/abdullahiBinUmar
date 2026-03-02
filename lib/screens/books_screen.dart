@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import '../l10n/app_localizations.dart';
 
 import '../data/books_data.dart';
 import '../widgets/mini_player.dart';
 import 'lessons_screen.dart';
 import '../widgets/app_drawer.dart';
 import '../constants/app_colors.dart';
+import '../constants/responsive.dart';
 
 
 class BooksScreen extends StatefulWidget {
@@ -27,13 +30,15 @@ class _BooksScreenState extends State<BooksScreen> {
              book.description.toLowerCase().contains(query);
     }).toList();
 
+    final r = Responsive(context);
+
     return Scaffold(
       drawer: const AppDrawer(),
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
           SliverAppBar(
-            expandedHeight: 160.0,
+            expandedHeight: r.h(160).clamp(120.0, 200.0),
             floating: false,
             pinned: true,
             centerTitle: true,
@@ -41,13 +46,13 @@ class _BooksScreenState extends State<BooksScreen> {
             backgroundColor: AppColors.surfaceWhite,
             flexibleSpace: FlexibleSpaceBar(
               centerTitle: true,
-              titlePadding: const EdgeInsets.symmetric(vertical: 16),
+              titlePadding: EdgeInsets.symmetric(vertical: r.s(16)),
               title: Text(
-                "Bin Umar Library",
+                AppLocalizations.of(context).translate('app_title'),
                 style: GoogleFonts.outfit(
                   fontWeight: FontWeight.bold,
                   color: AppColors.primaryGreen,
-                  fontSize: 22,
+                  fontSize: r.sp(20),
                 ),
               ),
               background: Container(
@@ -66,34 +71,34 @@ class _BooksScreenState extends State<BooksScreen> {
             ),
             actions: [
               Padding(
-                padding: const EdgeInsets.only(right: 12),
+                padding: EdgeInsets.only(right: r.s(12)),
                 child: IconButton(
                   onPressed: () {},
-                  icon: const Icon(Icons.search_rounded, size: 28),
+                  icon: Icon(Icons.search_rounded, size: r.s(26)),
                 ),
               ),
             ],
           ),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+              padding: EdgeInsets.fromLTRB(r.s(24), r.s(8), r.s(24), r.s(24)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Assalamu Alaikum",
+                    AppLocalizations.of(context).translate('greeting'),
                     style: GoogleFonts.inter(
-                      fontSize: 14,
+                      fontSize: r.sp(13),
                       fontWeight: FontWeight.w500,
                       color: Colors.black38,
                       letterSpacing: 1.1,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: r.s(4)),
                   Text(
-                   "Bismillahir Rahmanir Rahim",
+                    AppLocalizations.of(context).translate('bismillah'),
                     style: GoogleFonts.amiri(
-                      fontSize: 20,
+                      fontSize: r.sp(20),
                       fontWeight: FontWeight.bold,
                       color: AppColors.accentGold,
                     ),
@@ -103,101 +108,114 @@ class _BooksScreenState extends State<BooksScreen> {
             ),
           ),
           SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: EdgeInsets.symmetric(horizontal: r.s(20)),
             sliver: SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
                   final book = filteredBooks[index];
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 20),
-                    child: Card(
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => LessonsScreen(book: book),
-                            ),
-                          );
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Row(
-                            children: [
-                              Hero(
-                                tag: 'book_${book.id}',
-                                child: Container(
-                                  width: 85,
-                                  height: 120,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(16),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withValues(alpha: 0.1),
-                                        blurRadius: 15,
-                                        offset: const Offset(4, 8),
-                                      ),
-                                    ],
-                                    image: const DecorationImage(
-                                      image: AssetImage('assets/images/bin_umar.jpg'),
-                                      fit: BoxFit.cover,
-                                    ),
+                  // Book cover height scales with screen
+                  final coverWidth = r.s(80).clamp(70.0, 100.0);
+                  final coverHeight = r.s(115).clamp(100.0, 140.0);
+
+                  return AnimationConfiguration.staggeredList(
+                    position: index,
+                    duration: const Duration(milliseconds: 500),
+                    child: SlideAnimation(
+                      verticalOffset: 50.0,
+                      child: FadeInAnimation(
+                        child: Container(
+                          margin: EdgeInsets.only(bottom: r.s(18)),
+                          child: Card(
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => LessonsScreen(book: book),
                                   ),
-                                ),
-                              ),
-                              const SizedBox(width: 20),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                );
+                              },
+                              child: Padding(
+                                padding: EdgeInsets.all(r.s(14)),
+                                child: Row(
                                   children: [
-                                    Text(
-                                      book.title,
-                                      style: GoogleFonts.outfit(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18,
-                                        color: Colors.black87,
-                                        height: 1.2,
+                                    Hero(
+                                      tag: 'book_${book.id}',
+                                      child: Container(
+                                        width: coverWidth,
+                                        height: coverHeight,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(r.s(16)),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withValues(alpha: 0.1),
+                                              blurRadius: r.s(15),
+                                              offset: Offset(r.s(4), r.s(8)),
+                                            ),
+                                          ],
+                                          image: const DecorationImage(
+                                            image: AssetImage('assets/images/bin_umar.jpg'),
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      book.titleAr,
-                                      textDirection: TextDirection.rtl,
-                                      style: GoogleFonts.amiri(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 17,
-                                        color: AppColors.accentGold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.primaryGreen.withValues(alpha: 0.08),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
+                                    SizedBox(width: r.s(18)),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Icon(Icons.playlist_play_rounded, size: 16, color: AppColors.primaryGreen),
-                                          const SizedBox(width: 6),
                                           Text(
-                                            "${book.lessonCount} Lessons",
-                                            style: GoogleFonts.inter(
-                                              color: AppColors.primaryGreen,
-                                              fontSize: 11,
+                                            book.title,
+                                            style: GoogleFonts.outfit(
                                               fontWeight: FontWeight.bold,
-                                              letterSpacing: 0.5,
+                                              fontSize: r.sp(16),
+                                              color: Colors.black87,
+                                              height: 1.2,
+                                            ),
+                                          ),
+                                          SizedBox(height: r.s(6)),
+                                          Text(
+                                            book.titleAr,
+                                            textDirection: TextDirection.rtl,
+                                            style: GoogleFonts.amiri(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: r.sp(16),
+                                              color: AppColors.accentGold,
+                                            ),
+                                          ),
+                                          SizedBox(height: r.s(14)),
+                                          Container(
+                                            padding: EdgeInsets.symmetric(horizontal: r.s(10), vertical: r.s(6)),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.primaryGreen.withValues(alpha: 0.08),
+                                              borderRadius: BorderRadius.circular(r.s(12)),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(Icons.playlist_play_rounded, size: r.s(15), color: AppColors.primaryGreen),
+                                                SizedBox(width: r.s(6)),
+                                                Text(
+                                                  "${book.lessonCount} ${AppLocalizations.of(context).translate('lessons')}",
+                                                  style: GoogleFonts.inter(
+                                                    color: AppColors.primaryGreen,
+                                                    fontSize: r.sp(11),
+                                                    fontWeight: FontWeight.bold,
+                                                    letterSpacing: 0.5,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ],
                                       ),
                                     ),
+                                    Icon(Icons.arrow_forward_ios_rounded, size: r.s(14), color: Colors.grey.withValues(alpha: 0.3)),
                                   ],
                                 ),
                               ),
-                              Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey.withValues(alpha: 0.3)),
-                            ],
+                            ),
                           ),
                         ),
                       ),
@@ -208,7 +226,7 @@ class _BooksScreenState extends State<BooksScreen> {
               ),
             ),
           ),
-          const SliverToBoxAdapter(child: SizedBox(height: 120)),
+          SliverToBoxAdapter(child: SizedBox(height: r.s(120))),
         ],
       ),
       bottomNavigationBar: const MiniPlayer(),

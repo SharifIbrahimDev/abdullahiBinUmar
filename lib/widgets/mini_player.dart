@@ -5,12 +5,15 @@ import '../providers/player_provider.dart';
 import '../screens/player_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_colors.dart';
+import '../constants/responsive.dart';
+import '../l10n/app_localizations.dart';
 
 class MiniPlayer extends StatelessWidget {
   const MiniPlayer({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final r = Responsive(context);
 
     return Consumer<PlayerProvider>(
       builder: (context, provider, child) {
@@ -36,23 +39,23 @@ class MiniPlayer extends StatelessWidget {
             );
           },
           child: Container(
-            margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-            height: 76,
+            margin: EdgeInsets.fromLTRB(r.s(16), 0, r.s(16), r.s(24)),
+            height: r.s(76).clamp(65.0, 90.0),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(r.s(24)),
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  padding: EdgeInsets.symmetric(horizontal: r.s(12)),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.85),
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.circular(r.s(24)),
                     border: Border.all(color: Colors.white.withOpacity(0.5)),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.1),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
+                        blurRadius: r.s(20),
+                        offset: Offset(0, r.s(8)),
                       ),
                     ],
                   ),
@@ -61,10 +64,10 @@ class MiniPlayer extends StatelessWidget {
                       Hero(
                         tag: 'mini_art',
                         child: Container(
-                          width: 52,
-                          height: 52,
+                          width: r.s(52).clamp(45.0, 60.0),
+                          height: r.s(52).clamp(45.0, 60.0),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(r.s(16)),
                             image: const DecorationImage(
                               image: AssetImage('assets/images/bin_umar.jpg'),
                               fit: BoxFit.cover,
@@ -72,7 +75,7 @@ class MiniPlayer extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 14),
+                      SizedBox(width: r.s(14)),
                       Expanded(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -82,17 +85,19 @@ class MiniPlayer extends StatelessWidget {
                               provider.currentLesson!.title,
                               style: GoogleFonts.outfit(
                                 fontWeight: FontWeight.bold,
-                                fontSize: 15,
+                                fontSize: r.sp(14),
                                 color: Colors.black87,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
-                            const SizedBox(height: 2),
+                            SizedBox(height: r.s(2)),
                             Text(
-                              provider.isPlaying ? "Now Playing" : "Paused",
+                              provider.isPlaying 
+                                ? AppLocalizations.of(context).translate('now_playing') 
+                                : AppLocalizations.of(context).translate('paused'),
                               style: GoogleFonts.inter(
-                                fontSize: 11,
+                                fontSize: r.sp(10),
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.primaryGreen,
                                 letterSpacing: 0.5,
@@ -105,14 +110,14 @@ class MiniPlayer extends StatelessWidget {
                         icon: Icon(
                           provider.isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
                           color: Colors.black87,
-                          size: 28,
+                          size: r.s(26),
                         ),
                         onPressed: () {
                           provider.isPlaying ? provider.pause() : provider.resume();
                         },
                       ),
                       IconButton(
-                        icon: const Icon(Icons.skip_next_rounded, color: Colors.black87, size: 28),
+                        icon: Icon(Icons.skip_next_rounded, color: Colors.black87, size: r.s(26)),
                         onPressed: provider.playNext,
                       ),
                     ],

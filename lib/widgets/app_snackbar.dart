@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../constants/responsive.dart';
 
 class AppSnackbar {
   static void showSuccess(BuildContext context, String message) {
@@ -16,6 +17,7 @@ class AppSnackbar {
 
   static void _show(BuildContext context, String message, Color color, IconData icon) {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final r = Responsive(context);
     
     scaffoldMessenger.clearSnackBars();
     scaffoldMessenger.showSnackBar(
@@ -24,15 +26,15 @@ class AppSnackbar {
         behavior: SnackBarBehavior.floating,
         backgroundColor: Colors.transparent,
         content: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: EdgeInsets.symmetric(horizontal: r.s(16), vertical: r.s(12)),
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.95),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(r.s(16)),
             boxShadow: [
               BoxShadow(
                 color: color.withValues(alpha: 0.2),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
+                blurRadius: r.s(12),
+                offset: Offset(0, r.s(4)),
               ),
             ],
             border: Border.all(
@@ -42,14 +44,14 @@ class AppSnackbar {
           ),
           child: Row(
             children: [
-              Icon(icon, color: Colors.white, size: 24),
-              const SizedBox(width: 12),
+              Icon(icon, color: Colors.white, size: r.s(24)),
+              SizedBox(width: r.s(12)),
               Expanded(
                 child: Text(
                   message,
                   style: GoogleFonts.inter(
                     color: Colors.white,
-                    fontSize: 14,
+                    fontSize: r.sp(14),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -58,9 +60,9 @@ class AppSnackbar {
           ),
         ),
         margin: EdgeInsets.only(
-          bottom: MediaQuery.of(context).size.height * 0.02,
-          left: 16,
-          right: 16,
+          bottom: r.screenHeight * 0.02,
+          left: r.s(16),
+          right: r.s(16),
         ),
         duration: const Duration(seconds: 4),
       ),
@@ -68,9 +70,19 @@ class AppSnackbar {
   }
 
   // Static method for global access when context is available via key
+  // Safe to use a hardcoded value here, or we can look up context if available
   static void showGlobalError(GlobalKey<ScaffoldMessengerState> key, String message) {
     final state = key.currentState;
     if (state == null) return;
+
+    // Use current context if available to get scaling, otherwise use hardcoded fallback
+    BuildContext? ctx = key.currentContext;
+    double scale = 1.0;
+    if (ctx != null) {
+      scale = Responsive(ctx).s(1.0);
+    }
+    
+    double s(double val) => val * scale;
 
     state.clearSnackBars();
     state.showSnackBar(
@@ -79,28 +91,28 @@ class AppSnackbar {
         behavior: SnackBarBehavior.floating,
         backgroundColor: Colors.transparent,
         content: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: EdgeInsets.symmetric(horizontal: s(16), vertical: s(12)),
           decoration: BoxDecoration(
             color: const Color(0xFFC62828).withValues(alpha: 0.95),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(s(16)),
             boxShadow: [
               BoxShadow(
                 color: const Color(0xFFC62828).withValues(alpha: 0.2),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
+                blurRadius: s(12),
+                offset: Offset(0, s(4)),
               ),
             ],
           ),
           child: Row(
             children: [
-              const Icon(Icons.error_outline, color: Colors.white, size: 24),
-              const SizedBox(width: 12),
+              Icon(Icons.error_outline, color: Colors.white, size: s(24)),
+              SizedBox(width: s(12)),
               Expanded(
                 child: Text(
                   message,
                   style: GoogleFonts.inter(
                     color: Colors.white,
-                    fontSize: 14,
+                    fontSize: s(14), // Approx equivalent scaling for text
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -108,7 +120,7 @@ class AppSnackbar {
             ],
           ),
         ),
-        margin: const EdgeInsets.all(16),
+        margin: EdgeInsets.all(s(16)),
         duration: const Duration(seconds: 4),
       ),
     );

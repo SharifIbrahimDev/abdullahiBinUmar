@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'l10n/app_localizations.dart';
+import 'providers/player_provider.dart';
+import 'providers/locale_provider.dart';
 import 'screens/books_screen.dart';
 import 'screens/about_screen.dart';
 import 'screens/developer_screen.dart';
@@ -16,16 +21,35 @@ import 'services/audio_service.dart';
 import 'constants/app_colors.dart';
 
 
+import 'package:just_audio_background/just_audio_background.dart';
+
 final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
-void main() {
-  runApp(
-      ChangeNotifierProvider(
-        create: (_) => PlayerProvider(),
-        child: const MyApp(),
-      ),
-      );
+Future<void> main() async {
+  try {
+    WidgetsFlutterBinding.ensureInitialized();
+    
+    await JustAudioBackground.init(
+      androidNotificationChannelId: 'com.sharifibrahimdev.abdullahibinumar.channel.audio',
+      androidNotificationChannelName: 'Audio playback',
+      androidNotificationOngoing: true,
+    );
+    
+    await audioService.init();
+  } catch (e) {
+    debugPrint('Init failure: $e');
   }
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => PlayerProvider()),
+        ChangeNotifierProvider(create: (_) => LocaleProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
+}
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -47,9 +71,23 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    final localeProvider = Provider.of<LocaleProvider>(context);
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Sheikh Abdullahi Bin Umar',
+      locale: localeProvider.locale,
+      localizationsDelegates: const [
+        AppLocalizationsDelegate(),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en', ''), // English
+        Locale('ha', ''), // Hausa
+        Locale('ar', ''), // Arabic
+      ],
       theme: ThemeData(
         useMaterial3: true,
         primaryColor: AppColors.primaryGreen,

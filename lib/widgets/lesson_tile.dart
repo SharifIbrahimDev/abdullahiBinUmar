@@ -5,6 +5,7 @@ import '../models/lesson.dart';
 import '../screens/player_screen.dart';
 import '../providers/player_provider.dart';
 import '../constants/app_colors.dart';
+import '../constants/responsive.dart';
 
 class LessonTile extends StatelessWidget {
   final Lesson lesson;
@@ -29,29 +30,31 @@ class LessonTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final r = Responsive(context);
+
     return Consumer<PlayerProvider>(
       builder: (context, provider, child) {
         final currentDuration = provider.getLessonDuration(lesson);
         final isActive = isPlaying || (provider.currentLesson?.id == lesson.id);
         
         return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          margin: EdgeInsets.symmetric(horizontal: r.s(16), vertical: r.s(8)),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(r.s(20)),
             border: isActive ? Border.all(color: AppColors.primaryGreen, width: 1.5) : null,
             boxShadow: [
               BoxShadow(
                 color: AppColors.primaryGreen.withOpacity(0.05),
-                blurRadius: 15,
-                offset: const Offset(0, 5),
+                blurRadius: r.s(15),
+                offset: Offset(0, r.s(5)),
               ),
             ],
           ),
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(r.s(20)),
               onTap: () {
                 Navigator.push(
                   context,
@@ -71,15 +74,15 @@ class LessonTile extends StatelessWidget {
                 );
               },
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(r.s(16.0)),
                 child: Row(
                   children: [
                     Container(
-                      width: 48,
-                      height: 48,
+                      width: r.s(45).clamp(40.0, 52.0),
+                      height: r.s(45).clamp(40.0, 52.0),
                       decoration: BoxDecoration(
                         color: isActive ? AppColors.primaryGreen : AppColors.surfaceWhite,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(r.s(12)),
                       ),
                       child: Center(
                         child: Text(
@@ -87,12 +90,12 @@ class LessonTile extends StatelessWidget {
                           style: GoogleFonts.outfit(
                             color: isActive ? Colors.white : Colors.black87,
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: r.sp(15),
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    SizedBox(width: r.s(16)),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,29 +104,29 @@ class LessonTile extends StatelessWidget {
                             lesson.title,
                             style: GoogleFonts.outfit(
                               fontWeight: FontWeight.w600,
-                              fontSize: 16,
+                              fontSize: r.sp(15),
                               color: Colors.black87,
                             ),
                           ),
-                          const SizedBox(height: 2),
+                          SizedBox(height: r.s(2)),
                           Text(
                             lesson.titleAr,
                             textDirection: TextDirection.rtl,
                             style: GoogleFonts.amiri(
                               fontWeight: FontWeight.w600,
-                              fontSize: 15,
+                              fontSize: r.sp(14),
                               color: isActive ? AppColors.accentGold : Colors.black54,
                             ),
                           ),
-                          const SizedBox(height: 6),
+                          SizedBox(height: r.s(4)),
                           Row(
                             children: [
-                              Icon(Icons.access_time_rounded, size: 12, color: Colors.grey[400]),
-                              const SizedBox(width: 4),
+                              Icon(Icons.access_time_rounded, size: r.s(12), color: Colors.grey[400]),
+                              SizedBox(width: r.s(4)),
                               Text(
                                 _formatDuration(currentDuration),
                                 style: GoogleFonts.inter(
-                                  fontSize: 12,
+                                  fontSize: r.sp(11),
                                   color: Colors.grey[500],
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -136,7 +139,7 @@ class LessonTile extends StatelessWidget {
                     Icon(
                       isPlaying ? Icons.pause_circle_filled_rounded : Icons.play_circle_filled_rounded,
                       color: AppColors.primaryGreen,
-                      size: 40,
+                      size: r.s(36),
                     ),
                   ],
                 ),

@@ -2,6 +2,7 @@ import 'package:universal_io/io.dart'; // 👈 Use universal_io for File/Platfor
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
@@ -13,8 +14,10 @@ import '../models/lesson.dart';
 const String baseAudioUrl = 'https://raw.githubusercontent.com/SharifIbrahimDev/abdullahiBinUmar/incremental-final/';
 
 class AudioService {
-  final AudioPlayer _player = AudioPlayer();
+  late AudioPlayer _player;
   final Dio _dio = Dio();
+  
+  bool _isInitialized = false;
   
   Lesson? _currentLesson;
   List<Lesson> _currentPlaylist = [];
@@ -29,8 +32,11 @@ class AudioService {
   AudioPlayer get player => _player;
   Lesson? get currentLesson => _currentLesson;
 
-  AudioService() {
+  Future<void> init() async {
+    if (_isInitialized) return;
+    _player = AudioPlayer();
     _initListeners();
+    _isInitialized = true;
   }
 
   void _initListeners() {
@@ -60,29 +66,42 @@ class AudioService {
         if (kIsWeb && effectivePath.startsWith('assets/')) {
           effectivePath = effectivePath.replaceFirst('assets/', '');
         }
-        await _player.setAudioSource(AudioSource.asset(effectivePath));
+        final mediaItem = MediaItem(
+          id: lesson.id,
+          album: lesson.bookTitle,
+          title: lesson.title,
+          artUri: Uri.parse('asset:///assets/images/bin_umar.jpg'),
+        );
+        await _player.setAudioSource(AudioSource.asset(effectivePath, tag: mediaItem));
       } else {
         final remoteUrl = Uri.encodeFull('$baseAudioUrl${lesson.audioPath}').replaceAll("'", "%27");
         
         debugPrint('🔍 Requested URL: $remoteUrl'); // Debug #1
 
+        final mediaItem = MediaItem(
+          id: lesson.id,
+          album: lesson.bookTitle,
+          title: lesson.title,
+          artUri: Uri.parse('asset:///assets/images/bin_umar.jpg'),
+        );
+
         if (kIsWeb) {
           // 🌐 Web: Direct Stream (No Caching, No DNS check)
           debugPrint('🌐 Web Mode: Streaming directly...');
-          await _player.setAudioSource(AudioSource.uri(Uri.parse(remoteUrl)));
+          await _player.setAudioSource(AudioSource.uri(Uri.parse(remoteUrl), tag: mediaItem));
         } else {
           // 📱 Mobile: Cached Streaming + Offline Check
           final localFile = await _getCacheFile(lesson.audioPath);
 
           if (await localFile.exists()) {
             debugPrint('📂 Paying from Cache: ${localFile.path}');
-            await _player.setAudioSource(AudioSource.file(localFile.path));
+            await _player.setAudioSource(AudioSource.file(localFile.path, tag: mediaItem));
           } else {
             try {
                final result = await InternetAddress.lookup('google.com');
                if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
                  debugPrint('📡 Online: Streaming & Downloading...');
-                 await _player.setAudioSource(AudioSource.uri(Uri.parse(remoteUrl)));
+                 await _player.setAudioSource(AudioSource.uri(Uri.parse(remoteUrl), tag: mediaItem));
                  _downloadToCache(remoteUrl, localFile);
                }
             } on SocketException catch (e) {
@@ -175,7 +194,7 @@ class AudioService {
 
   void dispose() {
     currentPathNotifier.dispose();
-    _player.dispose();
+    if (_isInitialized) _player.dispose();
   }
   /// Sets the playlist context for auto-play navigation
   void setPlaylist(List<Lesson> playlist) {

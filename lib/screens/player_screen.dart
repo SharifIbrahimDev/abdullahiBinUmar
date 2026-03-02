@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 import '../models/lesson.dart';
 import '../providers/player_provider.dart';
 import '../constants/app_colors.dart';
-
+import '../constants/responsive.dart';
 
 class PlayerScreen extends StatefulWidget {
   final List<Lesson> lessons;
@@ -45,14 +45,13 @@ class _PlayerScreenState extends State<PlayerScreen> {
       await _provider.playLesson(
         lessonToPlay,
         startPosition: Duration(seconds: savedSeconds),
-        playlist: widget.lessons, // 3️⃣ Passes playlist for Auto-Play Next
+        playlist: widget.lessons, 
       );
     } catch (e) {
       debugPrint('Error loading lesson: $e');
     }
   }
 
-  // Use provider's lesson if available for auto-sync, otherwise fallback to index
   Lesson get _displayLesson => _provider.currentLesson ?? widget.lessons[_currentIndex];
 
   Future<void> _playNext() async {
@@ -79,11 +78,17 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = Responsive(context);
+
+    // Dynamic album art sizing to fit all screen heights safely
+    final albumArtSize = r.screenHeight * 0.35;
+    final clampedSize = albumArtSize.clamp(200.0, 360.0);
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.black,
       appBar: AppBar(
-        leadingWidth: 80,
+        leadingWidth: r.s(80),
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: Center(
@@ -91,16 +96,16 @@ class _PlayerScreenState extends State<PlayerScreen> {
             color: Colors.white.withValues(alpha: 0.1),
             shape: const CircleBorder(),
             child: IconButton(
-              icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white, size: 28),
+              icon: Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white, size: r.s(28)),
               onPressed: () => Navigator.pop(context),
             ),
           ),
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 20),
+            padding: EdgeInsets.only(right: r.s(20)),
             child: IconButton(
-              icon: const Icon(Icons.more_vert_rounded, color: Colors.white),
+              icon: Icon(Icons.more_vert_rounded, color: Colors.white, size: r.s(24)),
               onPressed: () {},
             ),
           ),
@@ -144,21 +149,21 @@ class _PlayerScreenState extends State<PlayerScreen> {
                         constraints: BoxConstraints(minHeight: constraints.maxHeight),
                         child: Column(
                           children: [
-                            const SizedBox(height: 48),
+                            SizedBox(height: r.s(32)),
                             // Album Art
                             Hero(
                               tag: 'player_art',
                               child: Center(
                                 child: Container(
-                                  height: (constraints.maxHeight * 0.4).clamp(200, 360),
-                                  width: (constraints.maxHeight * 0.85).clamp(200, 360),
+                                  height: clampedSize,
+                                  width: clampedSize,
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(40),
+                                    borderRadius: BorderRadius.circular(r.s(40)),
                                     boxShadow: [
                                       BoxShadow(
                                         color: Colors.black.withValues(alpha: 0.6),
-                                        blurRadius: 40,
-                                        offset: const Offset(0, 20),
+                                        blurRadius: r.s(40),
+                                        offset: Offset(0, r.s(20)),
                                       ),
                                     ],
                                     image: const DecorationImage(
@@ -169,38 +174,38 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 40),
+                            SizedBox(height: r.s(32)),
                             // Titles
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 40),
+                              padding: EdgeInsets.symmetric(horizontal: r.s(32)),
                               child: Column(
                                 children: [
                                   Text(
                                     _displayLesson.title,
                                     style: GoogleFonts.outfit(
-                                      fontSize: 24,
+                                      fontSize: r.sp(22),
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
                                       letterSpacing: 0.5,
                                     ),
                                     textAlign: TextAlign.center,
                                   ),
-                                  const SizedBox(height: 8),
+                                  SizedBox(height: r.s(8)),
                                   Text(
                                     _displayLesson.bookTitle,
                                     style: GoogleFonts.inter(
-                                      fontSize: 14,
+                                      fontSize: r.sp(13),
                                       color: Colors.white.withValues(alpha: 0.5),
                                       letterSpacing: 1.2,
                                       fontWeight: FontWeight.w500,
                                     ),
                                     textAlign: TextAlign.center,
                                   ),
-                                  const SizedBox(height: 24),
+                                  SizedBox(height: r.s(16)),
                                   Text(
                                     _displayLesson.titleAr,
                                     style: GoogleFonts.amiri(
-                                      fontSize: 32,
+                                      fontSize: r.sp(28),
                                       color: AppColors.accentGold,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -209,23 +214,23 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 48),
+                            SizedBox(height: r.s(32)),
                             // Controls Container
                             Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 24),
-                              padding: const EdgeInsets.fromLTRB(20, 48, 20, 40),
+                              margin: EdgeInsets.symmetric(horizontal: r.s(20)),
+                              padding: EdgeInsets.fromLTRB(r.s(16), r.s(32), r.s(16), r.s(32)),
                               decoration: BoxDecoration(
                                 color: Colors.white.withValues(alpha: 0.05),
-                                borderRadius: BorderRadius.circular(48),
+                                borderRadius: BorderRadius.circular(r.s(48)),
                                 border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
                               ),
                               child: Column(
                                 children: [
                                   SliderTheme(
                                     data: SliderTheme.of(context).copyWith(
-                                      trackHeight: 6,
-                                      thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
-                                      overlayShape: const RoundSliderOverlayShape(overlayRadius: 20),
+                                      trackHeight: r.s(4),
+                                      thumbShape: RoundSliderThumbShape(enabledThumbRadius: r.s(8)),
+                                      overlayShape: RoundSliderOverlayShape(overlayRadius: r.s(20)),
                                       activeTrackColor: AppColors.accentGold,
                                       inactiveTrackColor: Colors.white.withValues(alpha: 0.1),
                                       thumbColor: Colors.white,
@@ -237,64 +242,64 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                     ),
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                                    padding: EdgeInsets.symmetric(horizontal: r.s(20)),
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text(_formatDuration(provider.position), style: GoogleFonts.inter(color: Colors.white.withValues(alpha: 0.5), fontSize: 12, fontWeight: FontWeight.bold)),
-                                        Text(_formatDuration(provider.duration), style: GoogleFonts.inter(color: Colors.white.withValues(alpha: 0.5), fontSize: 12, fontWeight: FontWeight.bold)),
+                                        Text(_formatDuration(provider.position), style: GoogleFonts.inter(color: Colors.white.withValues(alpha: 0.5), fontSize: r.sp(11), fontWeight: FontWeight.bold)),
+                                        Text(_formatDuration(provider.duration), style: GoogleFonts.inter(color: Colors.white.withValues(alpha: 0.5), fontSize: r.sp(11), fontWeight: FontWeight.bold)),
                                       ],
                                     ),
                                   ),
-                                  const SizedBox(height: 40),
+                                  SizedBox(height: r.s(32)),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: [
                                       IconButton(
                                         padding: EdgeInsets.zero,
                                         constraints: const BoxConstraints(),
-                                        icon: const Icon(Icons.skip_previous_rounded, color: Colors.white, size: 28),
+                                        icon: Icon(Icons.skip_previous_rounded, color: Colors.white, size: r.s(26)),
                                         onPressed: _playPrevious,
                                       ),
                                       IconButton(
                                         padding: EdgeInsets.zero,
                                         constraints: const BoxConstraints(),
-                                        icon: const Icon(Icons.replay_10_rounded, color: Colors.white, size: 24),
+                                        icon: Icon(Icons.replay_10_rounded, color: Colors.white, size: r.s(22)),
                                         onPressed: () => provider.seek(provider.position - const Duration(seconds: 10)),
                                       ),
                                       GestureDetector(
                                         onTap: () => isPlaying ? provider.pause() : provider.resume(),
                                         child: AnimatedContainer(
                                           duration: const Duration(milliseconds: 200),
-                                          width: 70,
-                                          height: 70,
+                                          width: r.s(64),
+                                          height: r.s(64),
                                           decoration: BoxDecoration(
                                             color: Colors.white,
                                             shape: BoxShape.circle,
                                             boxShadow: [
                                               BoxShadow(
                                                 color: Colors.white.withValues(alpha: 0.2),
-                                                blurRadius: 20,
+                                                blurRadius: r.s(20),
                                               ),
                                             ],
                                           ),
                                           child: Icon(
                                             isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
                                             color: Colors.black,
-                                            size: 48,
+                                            size: r.s(42),
                                           ),
                                         ),
                                       ),
                                       IconButton(
                                         padding: EdgeInsets.zero,
                                         constraints: const BoxConstraints(),
-                                        icon: const Icon(Icons.forward_10_rounded, color: Colors.white, size: 24),
+                                        icon: Icon(Icons.forward_10_rounded, color: Colors.white, size: r.s(22)),
                                         onPressed: () => provider.seek(provider.position + const Duration(seconds: 10)),
                                       ),
                                       IconButton(
                                         padding: EdgeInsets.zero,
                                         constraints: const BoxConstraints(),
-                                        icon: const Icon(Icons.skip_next_rounded, color: Colors.white, size: 28),
+                                        icon: Icon(Icons.skip_next_rounded, color: Colors.white, size: r.s(26)),
                                         onPressed: _playNext,
                                       ),
                                     ],
@@ -302,7 +307,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 48),
+                            SizedBox(height: r.s(48)),
                           ],
                         ),
                       ),
