@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../constants/responsive.dart';
+import '../l10n/app_localizations.dart';
 
 class ErrorDisplayWidget extends StatelessWidget {
   final String message;
@@ -25,18 +26,18 @@ class ErrorDisplayWidget extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(r.s(24)),
               decoration: BoxDecoration(
-                color: const Color(0xFFC62828).withValues(alpha: 0.1),
+                color: const Color(0xFF1B5E20).withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.error_outline_rounded,
-                color: const Color(0xFFC62828),
+                color: const Color(0xFF1B5E20),
                 size: r.s(64),
               ),
             ),
             SizedBox(height: r.s(24)),
             Text(
-              "Oops!",
+              AppLocalizations.of(context).translate('oops'),
               style: GoogleFonts.outfit(
                 fontSize: r.sp(24),
                 fontWeight: FontWeight.bold,
@@ -58,7 +59,10 @@ class ErrorDisplayWidget extends StatelessWidget {
               ElevatedButton.icon(
                 onPressed: onRetry,
                 icon: Icon(Icons.refresh_rounded, size: r.s(20)),
-                label: Text("Try Again", style: TextStyle(fontSize: r.sp(14))),
+                label: Text(
+                  AppLocalizations.of(context).translate('try_again'),
+                  style: TextStyle(fontSize: r.sp(14)),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1B5E20),
                   foregroundColor: Colors.white,

@@ -8,6 +8,8 @@ import '../constants/app_colors.dart';
 import '../constants/responsive.dart';
 import '../l10n/app_localizations.dart';
 
+import '../data/books_data.dart';
+
 class MiniPlayer extends StatelessWidget {
   const MiniPlayer({super.key});
 
@@ -21,12 +23,18 @@ class MiniPlayer extends StatelessWidget {
 
         return GestureDetector(
           onTap: () {
+            final currentLesson = provider.currentLesson!;
+            final playlist = provider.currentPlaylist.isNotEmpty
+                ? provider.currentPlaylist
+                : getLessonsForBook(currentLesson.id.split('_').first);
+            final initialIndex = playlist.indexWhere((l) => l.id == currentLesson.id);
+
             Navigator.push(
               context,
               PageRouteBuilder(
                 pageBuilder: (context, animation, secondaryAnimation) => PlayerScreen(
-                  lessons: [provider.currentLesson!],
-                  initialIndex: 0,
+                  lessons: playlist,
+                  initialIndex: initialIndex != -1 ? initialIndex : 0,
                 ),
                 transitionsBuilder: (context, animation, secondaryAnimation, child) {
                   const begin = Offset(0.0, 1.0);

@@ -9,9 +9,6 @@ import 'screens/books_screen.dart';
 import 'screens/about_screen.dart';
 import 'screens/developer_screen.dart';
 import 'screens/app_info_screen.dart';
-import 'package:provider/provider.dart';
-import 'providers/player_provider.dart';
-
 
 import 'screens/splash_screen.dart';
 
@@ -79,9 +76,9 @@ class _MyAppState extends State<MyApp> {
       locale: localeProvider.locale,
       localizationsDelegates: const [
         AppLocalizationsDelegate(),
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
+        FallbackMaterialLocalizationsDelegate(),
+        FallbackWidgetsLocalizationsDelegate(),
+        FallbackCupertinoLocalizationsDelegate(),
       ],
       supportedLocales: const [
         Locale('en', ''), // English
@@ -98,7 +95,7 @@ class _MyAppState extends State<MyApp> {
           secondary: AppColors.accentGold,
           surface: Colors.white,
           onSurface: Colors.black87,
-          secondaryContainer: AppColors.accentGold.withValues(alpha: 0.1),
+          secondaryContainer: AppColors.accentGold.withOpacity(0.1),
         ),
         // Premium Typography Hierarchy
         textTheme: GoogleFonts.outfitTextTheme(
@@ -126,7 +123,7 @@ class _MyAppState extends State<MyApp> {
           clipBehavior: Clip.antiAlias,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
-            side: BorderSide(color: Colors.grey.withValues(alpha: 0.08)),
+            side: BorderSide(color: Colors.grey.withOpacity(0.08)),
           ),
           color: Colors.white,
         ),

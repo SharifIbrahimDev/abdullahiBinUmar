@@ -99,7 +99,7 @@ class LessonsScreen extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.inter(
-                            color: Colors.white.withValues(alpha: 0.7),
+                            color: Colors.white.withOpacity(0.7),
                             fontSize: r.sp(13),
                             height: 1.4,
                           ),
@@ -145,7 +145,7 @@ class LessonsScreen extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: r.s(12), vertical: r.s(8)),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryGreen.withValues(alpha: 0.08),
+                      color: AppColors.primaryGreen.withOpacity(0.08),
                       borderRadius: BorderRadius.circular(r.s(16)),
                     ),
                     child: Row(

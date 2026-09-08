@@ -31,6 +31,7 @@ class AudioService {
 
   AudioPlayer get player => _player;
   Lesson? get currentLesson => _currentLesson;
+  List<Lesson> get currentPlaylist => _currentPlaylist;
 
   Future<void> init() async {
     if (_isInitialized) return;
@@ -40,14 +41,14 @@ class AudioService {
   }
 
   void _initListeners() {
-    // Listen for playback completion to trigger 3️⃣ Auto-Play Next
+    // Listen for playback completion to trigger Auto-Play Next
     _player.playerStateStream.listen((state) {
       if (state.processingState == ProcessingState.completed) {
         _handlePlaybackCompleted();
       }
     });
 
-    // 4️⃣ Resume From Last Position - Save position periodically
+    // Save position periodically
     _player.positionStream.listen((pos) {
       if (_currentLesson != null && pos > Duration.zero) {
         _savePlaybackState(pos);
@@ -60,54 +61,45 @@ class AudioService {
       _currentLesson = lesson;
       String effectivePath;
 
+      final mediaItem = MediaItem(
+        id: lesson.id,
+        album: lesson.bookTitle,
+        title: lesson.title,
+        artUri: Uri.parse('asset:///assets/images/bin_umar.jpg'),
+      );
+
       if (baseAudioUrl.isEmpty) {
-        // ... (asset logic)
         effectivePath = 'assets/audio/${lesson.audioPath}';
         if (kIsWeb && effectivePath.startsWith('assets/')) {
           effectivePath = effectivePath.replaceFirst('assets/', '');
         }
-        final mediaItem = MediaItem(
-          id: lesson.id,
-          album: lesson.bookTitle,
-          title: lesson.title,
-          artUri: Uri.parse('asset:///assets/images/bin_umar.jpg'),
-        );
         await _player.setAudioSource(AudioSource.asset(effectivePath, tag: mediaItem));
       } else {
         final remoteUrl = Uri.encodeFull('$baseAudioUrl${lesson.audioPath}').replaceAll("'", "%27");
-        
-        debugPrint('🔍 Requested URL: $remoteUrl'); // Debug #1
-
-        final mediaItem = MediaItem(
-          id: lesson.id,
-          album: lesson.bookTitle,
-          title: lesson.title,
-          artUri: Uri.parse('asset:///assets/images/bin_umar.jpg'),
-        );
+        debugPrint('🔍 Requested URL: $remoteUrl');
 
         if (kIsWeb) {
-          // 🌐 Web: Direct Stream (No Caching, No DNS check)
           debugPrint('🌐 Web Mode: Streaming directly...');
           await _player.setAudioSource(AudioSource.uri(Uri.parse(remoteUrl), tag: mediaItem));
         } else {
-          // 📱 Mobile: Cached Streaming + Offline Check
           final localFile = await _getCacheFile(lesson.audioPath);
 
           if (await localFile.exists()) {
-            debugPrint('📂 Paying from Cache: ${localFile.path}');
+            debugPrint('📂 Playing from Cache: ${localFile.path}');
             await _player.setAudioSource(AudioSource.file(localFile.path, tag: mediaItem));
           } else {
             try {
-               final result = await InternetAddress.lookup('google.com');
-               if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-                 debugPrint('📡 Online: Streaming & Downloading...');
-                 await _player.setAudioSource(AudioSource.uri(Uri.parse(remoteUrl), tag: mediaItem));
-                 _downloadToCache(remoteUrl, localFile);
-               }
+              debugPrint('📡 Streaming & Caching: $remoteUrl');
+              await _player.setAudioSource(AudioSource.uri(Uri.parse(remoteUrl), tag: mediaItem));
+              _downloadToCache(remoteUrl, localFile);
             } on SocketException catch (e) {
-               debugPrint('❌ Offline Error: $e');
-               _messageController.add("No Internet Connection. Please connect to WiFi or Mobile Data.");
-               return;
+              debugPrint('❌ Offline Socket Error: $e');
+              _messageController.add("No Internet Connection. Please connect to WiFi or Mobile Data.");
+              return;
+            } catch (e) {
+              debugPrint('❌ Stream source error: $e');
+              _messageController.add("Unable to play audio. Please check your network connection.");
+              return;
             }
           }
         }
@@ -125,17 +117,14 @@ class AudioService {
     }
   }
 
-  // ... (rest of methods)
-
-  /// 2️⃣ Download file to local cache
+  /// Download file to local cache in background
   Future<void> _downloadToCache(String url, File file) async {
     try {
-      // Create directory if missing
       await file.parent.create(recursive: true);
       await _dio.download(url, file.path);
       debugPrint('Downloaded to cache: ${file.path}');
     } catch (e) {
-      debugPrint('Download failed: $e');
+      debugPrint('Download to cache skipped/failed: $e');
     }
   }
 
@@ -145,20 +134,32 @@ class AudioService {
     return File(p.join(dir.path, 'audio_cache', relativePath));
   }
 
-  /// 3️⃣ Auto-Play Next Lesson Logic
+  /// Auto-Play Next Lesson Logic on track finish
   void _handlePlaybackCompleted() {
-    if (_currentPlaylist.isEmpty || _currentLesson == null) return;
+    playNext();
+  }
 
+  Future<void> playNext() async {
+    if (_currentPlaylist.isEmpty || _currentLesson == null) return;
     final currentIndex = _currentPlaylist.indexWhere((l) => l.id == _currentLesson!.id);
     if (currentIndex != -1 && currentIndex < _currentPlaylist.length - 1) {
       final nextLesson = _currentPlaylist[currentIndex + 1];
-      playLesson(nextLesson);
+      await playLesson(nextLesson);
     } else {
-      stop(); // End of book
+      await stop();
     }
   }
 
-  /// 4️⃣ Persist playback state to SharedPreferences
+  Future<void> playPrevious() async {
+    if (_currentPlaylist.isEmpty || _currentLesson == null) return;
+    final currentIndex = _currentPlaylist.indexWhere((l) => l.id == _currentLesson!.id);
+    if (currentIndex > 0) {
+      final prevLesson = _currentPlaylist[currentIndex - 1];
+      await playLesson(prevLesson);
+    }
+  }
+
+  /// Persist playback state to SharedPreferences
   Future<void> _savePlaybackState(Duration position) async {
     if (_currentLesson == null) return;
     final prefs = await SharedPreferences.getInstance();
@@ -167,7 +168,7 @@ class AudioService {
     await prefs.setInt('last_position_ms', position.inMilliseconds);
   }
 
-  /// 4️⃣ Load playback state from SharedPreferences
+  /// Load playback state from SharedPreferences
   Future<Map<String, dynamic>?> getSavedPlaybackState() async {
     final prefs = await SharedPreferences.getInstance();
     final bookId = prefs.getString('last_book_id');
@@ -196,6 +197,7 @@ class AudioService {
     currentPathNotifier.dispose();
     if (_isInitialized) _player.dispose();
   }
+
   /// Sets the playlist context for auto-play navigation
   void setPlaylist(List<Lesson> playlist) {
     _currentPlaylist = playlist;

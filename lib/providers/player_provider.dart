@@ -143,7 +143,10 @@ class PlayerProvider extends ChangeNotifier {
     });
   }
 
-  /// Plays a lesson and optionally sets the playlist for 3️⃣ Auto-Play Next
+  double _speed = 1.0;
+  double get speed => _speed;
+  List<Lesson> get currentPlaylist => audioService.currentPlaylist;
+
   Future<void> playLesson(Lesson lesson, {Duration? startPosition, List<Lesson>? playlist}) async {
     _currentLesson = lesson;
     _duration = _cachedDurations[lesson.id] ?? Duration.zero; 
@@ -174,12 +177,26 @@ class PlayerProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> setSpeed(double speed) async {
+    _speed = speed;
+    await audioService.player.setSpeed(speed);
+    notifyListeners();
+  }
+
   Future<void> playNext() async {
-    // 3️⃣ Auto-Play Next is now handled automatically in AudioService.
+    await audioService.playNext();
+    if (audioService.currentLesson != null) {
+      _currentLesson = audioService.currentLesson;
+      notifyListeners();
+    }
   }
 
   Future<void> playPrevious() async {
-    // Not implemented yet
+    await audioService.playPrevious();
+    if (audioService.currentLesson != null) {
+      _currentLesson = audioService.currentLesson;
+      notifyListeners();
+    }
   }
 
   @override

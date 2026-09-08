@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../constants/responsive.dart';
@@ -70,13 +71,19 @@ class AppInfoScreen extends StatelessWidget {
               ),
             ),
             SizedBox(height: r.s(8)),
-            Text(
-              "${AppLocalizations.of(context).translate('version')} 1.1.0",
-              style: GoogleFonts.inter(
-                fontSize: r.sp(14),
-                color: Colors.black38,
-                fontWeight: FontWeight.w600,
-              ),
+            FutureBuilder<PackageInfo>(
+              future: PackageInfo.fromPlatform(),
+              builder: (context, snapshot) {
+                final ver = snapshot.hasData ? snapshot.data!.version : "1.1.0";
+                return Text(
+                  "${AppLocalizations.of(context).translate('version')} $ver",
+                  style: GoogleFonts.inter(
+                    fontSize: r.sp(14),
+                    color: Colors.black38,
+                    fontWeight: FontWeight.w600,
+                  ),
+                );
+              },
             ),
             SizedBox(height: r.s(32)),
 
@@ -85,43 +92,47 @@ class AppInfoScreen extends StatelessWidget {
             SizedBox(height: r.s(16)),
             Consumer<LocaleProvider>(
               builder: (context, localeProvider, child) {
-                return Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(r.s(24)),
-                    border: Border.all(color: Colors.grey.withOpacity(0.08)),
-                  ),
-                  child: Column(
-                    children: [
-                      _buildLanguageTile(context, r, 
-                        title: AppLocalizations.of(context).translate('system_default'), 
-                        locale: null, 
-                        currentLocale: localeProvider.locale,
-                        onTap: () => localeProvider.clearLocale(),
-                      ),
-                      const Divider(height: 1, indent: 20, endIndent: 20),
-                      _buildLanguageTile(context, r, 
-                        title: AppLocalizations.of(context).translate('english'), 
-                        locale: const Locale('en'), 
-                        currentLocale: localeProvider.locale,
-                        onTap: () => localeProvider.setLocale(const Locale('en')),
-                      ),
-                      const Divider(height: 1, indent: 20, endIndent: 20),
-                      _buildLanguageTile(context, r, 
-                        title: AppLocalizations.of(context).translate('hausa'), 
-                        locale: const Locale('ha'), 
-                        currentLocale: localeProvider.locale,
-                        onTap: () => localeProvider.setLocale(const Locale('ha')),
-                      ),
-                      const Divider(height: 1, indent: 20, endIndent: 20),
-                      _buildLanguageTile(context, r, 
-                        title: AppLocalizations.of(context).translate('arabic'), 
-                        locale: const Locale('ar'), 
-                        currentLocale: localeProvider.locale,
-                        onTap: () => localeProvider.setLocale(const Locale('ar')),
-                      ),
-                    ],
-                  ),
+                return GridView.count(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisCount: 2,
+                  mainAxisSpacing: r.s(12),
+                  crossAxisSpacing: r.s(12),
+                  childAspectRatio: 1.5,
+                  children: [
+                    _buildLanguageCard(context, r, 
+                      title: AppLocalizations.of(context).translate('system_default'), 
+                      subtitle: "Auto",
+                      locale: null, 
+                      currentLocale: localeProvider.locale,
+                      onTap: () => localeProvider.clearLocale(),
+                      icon: Icons.brightness_auto_rounded,
+                    ),
+                    _buildLanguageCard(context, r, 
+                      title: AppLocalizations.of(context).translate('english'), 
+                      subtitle: "English",
+                      locale: const Locale('en'), 
+                      currentLocale: localeProvider.locale,
+                      onTap: () => localeProvider.setLocale(const Locale('en')),
+                      initials: "EN",
+                    ),
+                    _buildLanguageCard(context, r, 
+                      title: AppLocalizations.of(context).translate('hausa'), 
+                      subtitle: "Hausa",
+                      locale: const Locale('ha'), 
+                      currentLocale: localeProvider.locale,
+                      onTap: () => localeProvider.setLocale(const Locale('ha')),
+                      initials: "HA",
+                    ),
+                    _buildLanguageCard(context, r, 
+                      title: AppLocalizations.of(context).translate('arabic'), 
+                      subtitle: "العربية",
+                      locale: const Locale('ar'), 
+                      currentLocale: localeProvider.locale,
+                      onTap: () => localeProvider.setLocale(const Locale('ar')),
+                      initials: "AR",
+                    ),
+                  ],
                 );
               },
             ),
@@ -184,28 +195,94 @@ class AppInfoScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLanguageTile(BuildContext context, Responsive r, {
+  Widget _buildLanguageCard(BuildContext context, Responsive r, {
     required String title, 
+    required String subtitle,
     required Locale? locale, 
     required Locale? currentLocale,
     required VoidCallback onTap,
+    String? initials,
+    IconData? icon,
   }) {
     final isSelected = locale?.languageCode == currentLocale?.languageCode;
 
-    return ListTile(
+    return GestureDetector(
       onTap: onTap,
-      title: Text(
-        title,
-        style: GoogleFonts.outfit(
-          fontSize: r.sp(16),
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-          color: isSelected ? AppColors.primaryGreen : Colors.black87,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primaryGreen : Colors.white,
+          borderRadius: BorderRadius.circular(r.s(20)),
+          border: Border.all(
+            color: isSelected ? AppColors.primaryGreen : Colors.black.withOpacity(0.05),
+            width: 1.5,
+          ),
+          boxShadow: isSelected ? [
+            BoxShadow(
+              color: AppColors.primaryGreen.withOpacity(0.2),
+              blurRadius: r.s(8),
+              offset: Offset(0, r.s(4)),
+            ),
+          ] : null,
+        ),
+        child: Stack(
+          children: [
+            if (isSelected)
+              Positioned(
+                top: r.s(8),
+                right: r.s(8),
+                child: Icon(Icons.check_circle_rounded, color: Colors.white, size: r.s(16)),
+              ),
+            Padding(
+              padding: EdgeInsets.all(r.s(12)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: r.s(32),
+                    height: r.s(32),
+                    decoration: BoxDecoration(
+                      color: isSelected ? Colors.white.withOpacity(0.2) : AppColors.primaryGreen.withOpacity(0.08),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: icon != null 
+                        ? Icon(icon, color: isSelected ? Colors.white : AppColors.primaryGreen, size: r.s(18))
+                        : Text(
+                            initials ?? "",
+                            style: GoogleFonts.outfit(
+                              fontSize: r.sp(12),
+                              fontWeight: FontWeight.bold,
+                              color: isSelected ? Colors.white : AppColors.primaryGreen,
+                            ),
+                          ),
+                    ),
+                  ),
+                  SizedBox(height: r.s(8)),
+                  Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.outfit(
+                      fontSize: r.sp(14),
+                      fontWeight: FontWeight.bold,
+                      color: isSelected ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: GoogleFonts.inter(
+                      fontSize: r.sp(11),
+                      color: isSelected ? Colors.white70 : Colors.black38,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
-      trailing: isSelected 
-        ? Icon(Icons.check_circle_rounded, color: AppColors.primaryGreen, size: r.s(22))
-        : null,
-      contentPadding: EdgeInsets.symmetric(horizontal: r.s(20), vertical: r.s(4)),
     );
   }
 

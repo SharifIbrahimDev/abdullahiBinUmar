@@ -1,17 +1,19 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../constants/app_colors.dart';
 import '../constants/responsive.dart';
 import '../l10n/app_localizations.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:flutter/services.dart';
-import 'dart:io';
+import 'package:universal_io/io.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
 
-  static const platform = MethodChannel('com.example.app/share');
+  static const platform = MethodChannel('com.sharifibrahimdev.abdullahibinumar/share');
 
   Future<void> _shareApp(BuildContext context) async {
     final r = Responsive(context);
@@ -53,7 +55,7 @@ class AppDrawer extends StatelessWidget {
               title: l10n.translate('share_link'),
               onTap: () {
                 Navigator.pop(context);
-                Share.shareUri(Uri.parse('https://sharifibrahimdev.github.io'));
+                Share.shareUri(Uri.parse('https://play.google.com/store/apps/details?id=com.sharifibrahimdev.abdullahibinumar'));
               },
             ),
             SizedBox(height: r.s(12)),
@@ -119,164 +121,174 @@ class AppDrawer extends StatelessWidget {
 
     return Drawer(
       width: r.screenWidth * 0.85,
-      backgroundColor: Colors.transparent,
-      child: Stack(
-        children: [
-          // Glassmorphism background
-          Positioned.fill(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Container(
-                color: Colors.white.withValues(alpha: 0.9),
+      backgroundColor: Colors.white,
+      child: SafeArea(
+        top: false,
+        child: Column(
+          children: [
+            // Premium Header
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.fromLTRB(r.s(24), r.s(60), r.s(24), r.s(32)),
+              decoration: BoxDecoration(
+                color: AppColors.primaryGreen,
+                borderRadius: BorderRadius.only(bottomRight: Radius.circular(r.s(60))),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primaryGreen.withOpacity(0.2),
+                    blurRadius: r.s(20),
+                    offset: Offset(0, r.s(10)),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(r.s(3)),
+                    decoration: const BoxDecoration(
+                      color: AppColors.accentGold,
+                      shape: BoxShape.circle,
+                    ),
+                    child: CircleAvatar(
+                      radius: r.s(38).clamp(32.0, 48.0),
+                      backgroundImage: const AssetImage('assets/images/bin_umar.jpg'),
+                      backgroundColor: AppColors.primaryGreen.withOpacity(0.1),
+                    ),
+                  ),
+                  SizedBox(height: r.s(20)),
+                  Text(
+                    "Sheikh Abdullahi\nBin Umar",
+                    style: GoogleFonts.outfit(
+                      color: Colors.white,
+                      fontSize: r.sp(22),
+                      fontWeight: FontWeight.bold,
+                      height: 1.1,
+                    ),
+                  ),
+                  SizedBox(height: r.s(8)),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: r.s(10), vertical: r.s(4)),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(r.s(8)),
+                    ),
+                    child: Text(
+                      AppLocalizations.of(context).translate('islamic_audio_library'),
+                      style: GoogleFonts.inter(
+                        color: Colors.white,
+                        fontSize: r.sp(11),
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-          Column(
-            children: [
-              // Premium Header
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.fromLTRB(r.s(24), r.s(60), r.s(24), r.s(32)),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryGreen,
-                  borderRadius: BorderRadius.only(bottomRight: Radius.circular(r.s(60))),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primaryGreen.withValues(alpha: 0.2),
-                      blurRadius: r.s(20),
-                      offset: Offset(0, r.s(10)),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(r.s(3)),
-                      decoration: const BoxDecoration(
-                        color: AppColors.accentGold,
-                        shape: BoxShape.circle,
-                      ),
-                      child: CircleAvatar(
-                        radius: r.s(38).clamp(32.0, 48.0),
-                        backgroundImage: const AssetImage('assets/images/bin_umar.jpg'),
-                        backgroundColor: AppColors.primaryGreen.withValues(alpha: 0.1),
-                      ),
-                    ),
-                    SizedBox(height: r.s(20)),
-                    Text(
-                      "Sheikh Abdullahi\nBin Umar",
-                      style: GoogleFonts.outfit(
-                        color: Colors.white,
-                        fontSize: r.sp(22),
-                        fontWeight: FontWeight.bold,
-                        height: 1.1,
-                      ),
-                    ),
-                    SizedBox(height: r.s(8)),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: r.s(10), vertical: r.s(4)),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(r.s(8)),
-                      ),
-                      child: Text(
-                        AppLocalizations.of(context).translate('islamic_audio_library'),
+            SizedBox(height: r.s(16)),
+            // Menu Items
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.symmetric(horizontal: r.s(16)),
+                children: [
+                  _buildDrawerItem(
+                    context, r,
+                    icon: Icons.grid_view_rounded,
+                    title: AppLocalizations.of(context).translate('audio_books'),
+                    onTap: () => Navigator.pop(context),
+                    isActive: true,
+                  ),
+                  _buildDrawerItem(
+                    context, r,
+                    icon: Icons.person_outline_rounded,
+                    title: AppLocalizations.of(context).translate('about_sheikh'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, '/about');
+                    },
+                  ),
+                  _buildDrawerItem(
+                    context, r,
+                    icon: Icons.developer_mode_rounded,
+                    title: AppLocalizations.of(context).translate('about_developer'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, '/developer');
+                    },
+                  ),
+                  _buildDrawerItem(
+                    context, r,
+                    icon: Icons.info_outline_rounded,
+                    title: AppLocalizations.of(context).translate('about_app'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, '/app_info');
+                    },
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: r.s(20), vertical: r.s(12)),
+                    child: const Divider(color: Colors.black12, height: 1),
+                  ),
+                  _buildDrawerItem(
+                    context, r,
+                    icon: Icons.share_rounded,
+                    title: AppLocalizations.of(context).translate('share_app'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _shareApp(context);
+                    },
+                  ),
+                  _buildDrawerItem(
+                    context, r,
+                    icon: Icons.star_rate_rounded,
+                    title: AppLocalizations.of(context).translate('rate_app'),
+                    onTap: () async {
+                      Navigator.pop(context);
+                      final marketUri = Uri.parse('market://details?id=com.sharifibrahimdev.abdullahibinumar');
+                      final webUri = Uri.parse('https://play.google.com/store/apps/details?id=com.sharifibrahimdev.abdullahibinumar');
+                      try {
+                        if (!await launchUrl(marketUri, mode: LaunchMode.externalApplication)) {
+                          await launchUrl(webUri, mode: LaunchMode.externalApplication);
+                        }
+                      } catch (_) {
+                        await launchUrl(webUri, mode: LaunchMode.externalApplication);
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+            // Version Footer
+            Padding(
+              padding: EdgeInsets.all(r.s(24)),
+              child: FutureBuilder<PackageInfo>(
+                future: PackageInfo.fromPlatform(),
+                builder: (context, snapshot) {
+                  final versionText = snapshot.hasData
+                      ? "${AppLocalizations.of(context).translate('version')} ${snapshot.data!.version}"
+                      : "${AppLocalizations.of(context).translate('version')} 1.1.0";
+
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.verified_user_rounded, size: r.s(14), color: AppColors.primaryGreen.withOpacity(0.3)),
+                      SizedBox(width: r.s(8)),
+                      Text(
+                        versionText,
                         style: GoogleFonts.inter(
-                          color: Colors.white,
-                          fontSize: r.sp(11),
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.5,
+                          color: Colors.black26,
+                          fontSize: r.sp(12),
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  );
+                },
               ),
-              SizedBox(height: r.s(16)),
-              // Menu Items
-              Expanded(
-                child: ListView(
-                  padding: EdgeInsets.symmetric(horizontal: r.s(16)),
-                  children: [
-                    _buildDrawerItem(
-                      context, r,
-                      icon: Icons.grid_view_rounded,
-                      title: AppLocalizations.of(context).translate('audio_books'),
-                      onTap: () => Navigator.pop(context),
-                      isActive: true,
-                    ),
-                    _buildDrawerItem(
-                      context, r,
-                      icon: Icons.person_outline_rounded,
-                      title: AppLocalizations.of(context).translate('about_sheikh'),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.pushNamed(context, '/about');
-                      },
-                    ),
-                    _buildDrawerItem(
-                      context, r,
-                      icon: Icons.developer_mode_rounded,
-                      title: AppLocalizations.of(context).translate('about_developer'),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.pushNamed(context, '/developer');
-                      },
-                    ),
-                    _buildDrawerItem(
-                      context, r,
-                      icon: Icons.info_outline_rounded,
-                      title: AppLocalizations.of(context).translate('about_app'),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.pushNamed(context, '/app_info');
-                      },
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: r.s(20), vertical: r.s(12)),
-                      child: const Divider(color: Colors.black12, height: 1),
-                    ),
-                    _buildDrawerItem(
-                      context, r,
-                      icon: Icons.share_rounded,
-                      title: AppLocalizations.of(context).translate('share_app'),
-                      onTap: () {
-                        Navigator.pop(context);
-                        _shareApp(context);
-                      },
-                    ),
-                    _buildDrawerItem(
-                      context, r,
-                      icon: Icons.star_rate_rounded,
-                      title: AppLocalizations.of(context).translate('rate_app'),
-                      onTap: () => Navigator.pop(context),
-                    ),
-                  ],
-                ),
-              ),
-              // Version Footer
-              Padding(
-                padding: EdgeInsets.all(r.s(24)),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.verified_user_rounded, size: r.s(14), color: AppColors.primaryGreen.withValues(alpha: 0.3)),
-                    SizedBox(width: r.s(8)),
-                    Text(
-                      "${AppLocalizations.of(context).translate('version')} 1.1.0",
-                      style: GoogleFonts.inter(
-                        color: Colors.black26,
-                        fontSize: r.sp(12),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -308,7 +320,7 @@ class AppDrawer extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(r.s(16)),
         ),
-        tileColor: isActive ? AppColors.primaryGreen.withValues(alpha: 0.08) : Colors.transparent,
+        tileColor: isActive ? AppColors.primaryGreen.withOpacity(0.08) : Colors.transparent,
       ),
     );
   }

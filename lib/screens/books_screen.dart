@@ -19,15 +19,25 @@ class BooksScreen extends StatefulWidget {
 }
 
 class _BooksScreenState extends State<BooksScreen> {
-  final String _searchQuery = "";
+  String _searchQuery = "";
+  bool _isSearching = false;
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final filteredBooks = books.where((book) {
-      final query = _searchQuery.toLowerCase();
+      final query = _searchQuery.trim().toLowerCase();
+      if (query.isEmpty) return true;
       return book.title.toLowerCase().contains(query) ||
              book.titleAr.contains(query) ||
-             book.description.toLowerCase().contains(query);
+             book.description.toLowerCase().contains(query) ||
+             book.descriptionAr.contains(query);
     }).toList();
 
     final r = Responsive(context);
@@ -38,43 +48,92 @@ class _BooksScreenState extends State<BooksScreen> {
         physics: const BouncingScrollPhysics(),
         slivers: [
           SliverAppBar(
-            expandedHeight: r.h(160).clamp(120.0, 200.0),
+            expandedHeight: _isSearching ? r.h(100).clamp(90.0, 120.0) : r.h(160).clamp(120.0, 200.0),
             floating: false,
             pinned: true,
             centerTitle: true,
             elevation: 0,
             backgroundColor: AppColors.surfaceWhite,
-            flexibleSpace: FlexibleSpaceBar(
-              centerTitle: true,
-              titlePadding: EdgeInsets.symmetric(vertical: r.s(16)),
-              title: Text(
-                AppLocalizations.of(context).translate('app_title'),
-                style: GoogleFonts.outfit(
-                  fontWeight: FontWeight.bold,
+            leading: Builder(
+              builder: (context) => IconButton(
+                icon: Icon(
+                  _isSearching ? Icons.arrow_back_rounded : Icons.menu_rounded,
                   color: AppColors.primaryGreen,
-                  fontSize: r.sp(20),
+                  size: r.s(26),
                 ),
-              ),
-              background: Container(
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceWhite,
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      AppColors.primaryGreen.withValues(alpha: 0.05),
-                      AppColors.surfaceWhite,
-                    ],
-                  ),
-                ),
+                onPressed: () {
+                  if (_isSearching) {
+                    setState(() {
+                      _isSearching = false;
+                      _searchQuery = "";
+                      _searchController.clear();
+                    });
+                  } else {
+                    Scaffold.of(context).openDrawer();
+                  }
+                },
               ),
             ),
+            title: _isSearching
+                ? TextField(
+                    controller: _searchController,
+                    autofocus: true,
+                    style: GoogleFonts.outfit(fontSize: r.sp(16), color: Colors.black87),
+                    decoration: InputDecoration(
+                      hintText: AppLocalizations.of(context).translate('search'),
+                      hintStyle: GoogleFonts.inter(fontSize: r.sp(14), color: Colors.black38),
+                      border: InputBorder.none,
+                    ),
+                    onChanged: (val) => setState(() => _searchQuery = val),
+                  )
+                : null,
+            flexibleSpace: _isSearching
+                ? null
+                : FlexibleSpaceBar(
+                    centerTitle: true,
+                    titlePadding: EdgeInsets.symmetric(vertical: r.s(16)),
+                    title: Text(
+                      AppLocalizations.of(context).translate('app_title'),
+                      style: GoogleFonts.outfit(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryGreen,
+                        fontSize: r.sp(20),
+                      ),
+                    ),
+                    background: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceWhite,
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            AppColors.primaryGreen.withOpacity(0.05),
+                            AppColors.surfaceWhite,
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
             actions: [
               Padding(
                 padding: EdgeInsets.only(right: r.s(12)),
                 child: IconButton(
-                  onPressed: () {},
-                  icon: Icon(Icons.search_rounded, size: r.s(26)),
+                  onPressed: () {
+                    setState(() {
+                      if (_isSearching) {
+                        _isSearching = false;
+                        _searchQuery = "";
+                        _searchController.clear();
+                      } else {
+                        _isSearching = true;
+                      }
+                    });
+                  },
+                  icon: Icon(
+                    _isSearching ? Icons.close_rounded : Icons.search_rounded,
+                    size: r.s(26),
+                    color: AppColors.primaryGreen,
+                  ),
                 ),
               ),
             ],
@@ -148,7 +207,7 @@ class _BooksScreenState extends State<BooksScreen> {
                                           borderRadius: BorderRadius.circular(r.s(16)),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Colors.black.withValues(alpha: 0.1),
+                                              color: Colors.black.withOpacity(0.1),
                                               blurRadius: r.s(15),
                                               offset: Offset(r.s(4), r.s(8)),
                                             ),
@@ -188,7 +247,7 @@ class _BooksScreenState extends State<BooksScreen> {
                                           Container(
                                             padding: EdgeInsets.symmetric(horizontal: r.s(10), vertical: r.s(6)),
                                             decoration: BoxDecoration(
-                                              color: AppColors.primaryGreen.withValues(alpha: 0.08),
+                                              color: AppColors.primaryGreen.withOpacity(0.08),
                                               borderRadius: BorderRadius.circular(r.s(12)),
                                             ),
                                             child: Row(
@@ -211,7 +270,7 @@ class _BooksScreenState extends State<BooksScreen> {
                                         ],
                                       ),
                                     ),
-                                    Icon(Icons.arrow_forward_ios_rounded, size: r.s(14), color: Colors.grey.withValues(alpha: 0.3)),
+                                    Icon(Icons.arrow_forward_ios_rounded, size: r.s(14), color: Colors.grey.withOpacity(0.3)),
                                   ],
                                 ),
                               ),

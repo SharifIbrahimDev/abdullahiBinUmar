@@ -1,11 +1,11 @@
-package com.example.abdullahi_bin_umar
+package com.sharifibrahimdev.abdullahibinumar
 
 import com.ryanheise.audioservice.AudioServiceActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : AudioServiceActivity() {
-    private val CHANNEL = "com.example.app/share"
+    private val CHANNEL = "com.sharifibrahimdev.abdullahibinumar/share"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)

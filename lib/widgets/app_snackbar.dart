@@ -28,17 +28,17 @@ class AppSnackbar {
         content: Container(
           padding: EdgeInsets.symmetric(horizontal: r.s(16), vertical: r.s(12)),
           decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.95),
+            color: color.withOpacity(0.95),
             borderRadius: BorderRadius.circular(r.s(16)),
             boxShadow: [
               BoxShadow(
-                color: color.withValues(alpha: 0.2),
+                color: color.withOpacity(0.2),
                 blurRadius: r.s(12),
                 offset: Offset(0, r.s(4)),
               ),
             ],
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.2),
+              color: Colors.white.withOpacity(0.2),
               width: 1,
             ),
           ),
@@ -93,11 +93,11 @@ class AppSnackbar {
         content: Container(
           padding: EdgeInsets.symmetric(horizontal: s(16), vertical: s(12)),
           decoration: BoxDecoration(
-            color: const Color(0xFFC62828).withValues(alpha: 0.95),
+            color: const Color(0xFFC62828).withOpacity(0.95),
             borderRadius: BorderRadius.circular(s(16)),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFFC62828).withValues(alpha: 0.2),
+                color: const Color(0xFFC62828).withOpacity(0.2),
                 blurRadius: s(12),
                 offset: Offset(0, s(4)),
               ),

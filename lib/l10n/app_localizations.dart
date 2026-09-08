@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 class AppLocalizations {
   final Locale locale;
@@ -160,4 +162,64 @@ class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
 
   @override
   bool shouldReload(AppLocalizationsDelegate old) => false;
+}
+
+/// Fallback delegate to provide MaterialLocalizations for languages not supported by GlobalMaterialLocalizations
+class FallbackMaterialLocalizationsDelegate extends LocalizationsDelegate<MaterialLocalizations> {
+  const FallbackMaterialLocalizationsDelegate();
+
+  @override
+  bool isSupported(Locale locale) => true;
+
+  @override
+  Future<MaterialLocalizations> load(Locale locale) async {
+    try {
+      return await GlobalMaterialLocalizations.delegate.load(locale);
+    } catch (_) {
+      return await GlobalMaterialLocalizations.delegate.load(const Locale('en'));
+    }
+  }
+
+  @override
+  bool shouldReload(FallbackMaterialLocalizationsDelegate old) => false;
+}
+
+/// Fallback delegate for WidgetsLocalizations
+class FallbackWidgetsLocalizationsDelegate extends LocalizationsDelegate<WidgetsLocalizations> {
+  const FallbackWidgetsLocalizationsDelegate();
+
+  @override
+  bool isSupported(Locale locale) => true;
+
+  @override
+  Future<WidgetsLocalizations> load(Locale locale) async {
+    try {
+      return await GlobalWidgetsLocalizations.delegate.load(locale);
+    } catch (_) {
+      return await GlobalWidgetsLocalizations.delegate.load(const Locale('en'));
+    }
+  }
+
+  @override
+  bool shouldReload(FallbackWidgetsLocalizationsDelegate old) => false;
+}
+
+/// Fallback delegate for CupertinoLocalizations
+class FallbackCupertinoLocalizationsDelegate extends LocalizationsDelegate<CupertinoLocalizations> {
+  const FallbackCupertinoLocalizationsDelegate();
+
+  @override
+  bool isSupported(Locale locale) => true;
+
+  @override
+  Future<CupertinoLocalizations> load(Locale locale) async {
+    try {
+      return await GlobalCupertinoLocalizations.delegate.load(locale);
+    } catch (_) {
+      return await GlobalCupertinoLocalizations.delegate.load(const Locale('en'));
+    }
+  }
+
+  @override
+  bool shouldReload(FallbackCupertinoLocalizationsDelegate old) => false;
 }

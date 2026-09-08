@@ -27,17 +27,26 @@ class PlayerScreen extends StatefulWidget {
 class _PlayerScreenState extends State<PlayerScreen> {
   late PlayerProvider _provider;
   late int _currentIndex;
+  double? _dragValue;
 
   @override
   void initState() {
     super.initState();
     _provider = Provider.of<PlayerProvider>(context, listen: false);
     _currentIndex = widget.initialIndex;
-    _loadAndPlay();
+    
+    final current = _provider.currentLesson;
+    final target = widget.lessons.isNotEmpty ? widget.lessons[_currentIndex] : null;
+
+    // Only load and play if not already playing this lesson
+    if (target != null && (current == null || current.id != target.id)) {
+      _loadAndPlay();
+    }
   }
 
   Future<void> _loadAndPlay() async {
     try {
+      if (_currentIndex >= widget.lessons.length) return;
       final lessonToPlay = widget.lessons[_currentIndex];
       final prefs = await SharedPreferences.getInstance();
       final savedSeconds = prefs.getInt(lessonToPlay.id) ?? 0;
@@ -70,6 +79,62 @@ class _PlayerScreenState extends State<PlayerScreen> {
     }
   }
 
+  void _showSpeedModal(BuildContext context, Responsive r) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: EdgeInsets.all(r.s(24)),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(r.s(32))),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: r.s(40),
+              height: r.s(4),
+              margin: EdgeInsets.only(bottom: r.s(20)),
+              decoration: BoxDecoration(
+                color: Colors.black12,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Text(
+              "Playback Speed",
+              style: GoogleFonts.outfit(
+                fontSize: r.sp(18),
+                fontWeight: FontWeight.bold,
+                color: AppColors.primaryGreen,
+              ),
+            ),
+            SizedBox(height: r.s(16)),
+            Wrap(
+              spacing: r.s(10),
+              children: [0.75, 1.0, 1.25, 1.5, 2.0].map((speed) {
+                final isSelected = _provider.speed == speed;
+                return ChoiceChip(
+                  label: Text("${speed}x", style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
+                  selected: isSelected,
+                  selectedColor: AppColors.primaryGreen,
+                  labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.black87),
+                  onSelected: (selected) {
+                    if (selected) {
+                      _provider.setSpeed(speed);
+                      Navigator.pop(context);
+                    }
+                  },
+                );
+              }).toList(),
+            ),
+            SizedBox(height: r.s(16)),
+          ],
+        ),
+      ),
+    );
+  }
+
   String _formatDuration(Duration d) {
     final minutes = d.inMinutes.remainder(60).toString().padLeft(2, '0');
     final seconds = d.inSeconds.remainder(60).toString().padLeft(2, '0');
@@ -93,7 +158,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
         elevation: 0,
         leading: Center(
           child: Material(
-            color: Colors.white.withValues(alpha: 0.1),
+            color: Colors.white.withOpacity(0.1),
             shape: const CircleBorder(),
             child: IconButton(
               icon: Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white, size: r.s(28)),
@@ -103,10 +168,26 @@ class _PlayerScreenState extends State<PlayerScreen> {
         ),
         actions: [
           Padding(
-            padding: EdgeInsets.only(right: r.s(20)),
-            child: IconButton(
-              icon: Icon(Icons.more_vert_rounded, color: Colors.white, size: r.s(24)),
-              onPressed: () {},
+            padding: EdgeInsets.only(right: r.s(16)),
+            child: Consumer<PlayerProvider>(
+              builder: (context, provider, child) {
+                return TextButton(
+                  onPressed: () => _showSpeedModal(context, r),
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.white.withOpacity(0.15),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(r.s(16))),
+                    padding: EdgeInsets.symmetric(horizontal: r.s(12), vertical: r.s(6)),
+                  ),
+                  child: Text(
+                    "${provider.speed}x",
+                    style: GoogleFonts.outfit(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: r.sp(13),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ],
@@ -131,8 +212,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.black.withValues(alpha: 0.4),
-                        AppColors.primaryGreen.withValues(alpha: 0.9),
+                        Colors.black.withOpacity(0.4),
+                        AppColors.primaryGreen.withOpacity(0.9),
                         Colors.black,
                       ],
                     ),
@@ -161,7 +242,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                     borderRadius: BorderRadius.circular(r.s(40)),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withValues(alpha: 0.6),
+                                        color: Colors.black.withOpacity(0.6),
                                         blurRadius: r.s(40),
                                         offset: Offset(0, r.s(20)),
                                       ),
@@ -195,7 +276,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                     _displayLesson.bookTitle,
                                     style: GoogleFonts.inter(
                                       fontSize: r.sp(13),
-                                      color: Colors.white.withValues(alpha: 0.5),
+                                      color: Colors.white.withOpacity(0.5),
                                       letterSpacing: 1.2,
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -220,9 +301,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
                               margin: EdgeInsets.symmetric(horizontal: r.s(20)),
                               padding: EdgeInsets.fromLTRB(r.s(16), r.s(32), r.s(16), r.s(32)),
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.05),
+                                color: Colors.white.withOpacity(0.05),
                                 borderRadius: BorderRadius.circular(r.s(48)),
-                                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                                border: Border.all(color: Colors.white.withOpacity(0.1)),
                               ),
                               child: Column(
                                 children: [
@@ -232,13 +313,23 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                       thumbShape: RoundSliderThumbShape(enabledThumbRadius: r.s(8)),
                                       overlayShape: RoundSliderOverlayShape(overlayRadius: r.s(20)),
                                       activeTrackColor: AppColors.accentGold,
-                                      inactiveTrackColor: Colors.white.withValues(alpha: 0.1),
+                                      inactiveTrackColor: Colors.white.withOpacity(0.1),
                                       thumbColor: Colors.white,
                                     ),
                                     child: Slider(
-                                      value: provider.position.inSeconds.toDouble().clamp(0, provider.duration.inSeconds.toDouble() > 0 ? provider.duration.inSeconds.toDouble() : 1.0),
+                                      value: (_dragValue ?? provider.position.inSeconds.toDouble()).clamp(0.0, provider.duration.inSeconds.toDouble() > 0 ? provider.duration.inSeconds.toDouble() : 1.0),
                                       max: provider.duration.inSeconds.toDouble() > 0 ? provider.duration.inSeconds.toDouble() : 1.0,
-                                      onChanged: (value) => provider.seek(Duration(seconds: value.toInt())),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _dragValue = value;
+                                        });
+                                      },
+                                      onChangeEnd: (value) {
+                                        provider.seek(Duration(seconds: value.toInt()));
+                                        setState(() {
+                                          _dragValue = null;
+                                        });
+                                      },
                                     ),
                                   ),
                                   Padding(
@@ -246,8 +337,14 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text(_formatDuration(provider.position), style: GoogleFonts.inter(color: Colors.white.withValues(alpha: 0.5), fontSize: r.sp(11), fontWeight: FontWeight.bold)),
-                                        Text(_formatDuration(provider.duration), style: GoogleFonts.inter(color: Colors.white.withValues(alpha: 0.5), fontSize: r.sp(11), fontWeight: FontWeight.bold)),
+                                        Text(
+                                          _formatDuration(_dragValue != null ? Duration(seconds: _dragValue!.toInt()) : provider.position),
+                                          style: GoogleFonts.inter(color: Colors.white.withOpacity(0.5), fontSize: r.sp(11), fontWeight: FontWeight.bold),
+                                        ),
+                                        Text(
+                                          _formatDuration(provider.duration),
+                                          style: GoogleFonts.inter(color: Colors.white.withOpacity(0.5), fontSize: r.sp(11), fontWeight: FontWeight.bold),
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -278,7 +375,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                             shape: BoxShape.circle,
                                             boxShadow: [
                                               BoxShadow(
-                                                color: Colors.white.withValues(alpha: 0.2),
+                                                color: Colors.white.withOpacity(0.2),
                                                 blurRadius: r.s(20),
                                               ),
                                             ],
