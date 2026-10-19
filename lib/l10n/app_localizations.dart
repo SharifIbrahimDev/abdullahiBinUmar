@@ -53,7 +53,7 @@ class AppLocalizations {
       'share_apk': 'Share APK File (Offline)',
       'sheikh_role': 'Religious Scholar & Preacher',
       'sheikh_bio_title': 'Biography',
-      'sheikh_bio_content': 'Sheikh Abdullahi Bin Umar is a renowned Islamic scholar dedicated to teaching the Quran and Hadith. His comprehensive explanations of classical texts—including Sahihul Bukhari, Ash-Shatibiyyah, Alfiyyatus Siyudi, Muntaqa Ibnil Jarud, and Ilalut Tirmizi—have benefited thousands of students across the globe.',
+      'sheikh_bio_content': 'Sheikh Abdullahi Bin Umar is a renowned Islamic scholar dedicated to teaching the Quran and Hadith. His comprehensive explanations of classical texts—including Sahihul Bukhari, Ash-Shatibiyyah, Mulhatul I\'rab, Muntaqa Ibnil Jarud, and Ilalut Tirmizi—have benefited thousands of students across the globe.',
       'contact_sheikh': 'Contact Sheikh',
     },
     'ha': {
@@ -95,7 +95,7 @@ class AppLocalizations {
       'share_apk': 'Raba Fayil ɗin APK',
       'sheikh_role': 'Malamin Addini & Mai Wa\'azi',
       'sheikh_bio_title': 'Tarihin Sheikh',
-      'sheikh_bio_content': 'Sheikh Abdullahi Bin Umar babban malamin addinin Musulunci ne wanda ya sadaukar da kansa wajen koyar da Alkur\'ani da Hadisi. Sharhin sa akan manyan litattafai—kamarsu Sahihul Bukhari, Ash-Shatibiyyah, Alfiyyatus Siyudi, Muntaqa Ibnil Jarud, da kuma Ilalut Tirmizi—sun amfani dubun-dubatar ɗalibai.',
+      'sheikh_bio_content': 'Sheikh Abdullahi Bin Umar babban malamin addinin Musulunci ne wanda ya sadaukar da kansa wajen koyar da Alkur\'ani da Hadisi. Sharhin sa akan manyan litattafai—kamarsu Sahihul Bukhari, Ash-Shatibiyyah, Mulhatul I\'rab, Muntaqa Ibnil Jarud, da kuma Ilalut Tirmizi—sun amfani dubun-dubatar ɗalibai.',
       'contact_sheikh': 'Tuntuɓi Sheikh',
     },
     'ar': {
@@ -137,7 +137,7 @@ class AppLocalizations {
       'share_apk': 'مشاركة ملف APK',
       'sheikh_role': 'عالم دين وداعية',
       'sheikh_bio_title': 'سيرة الشيخ',
-      'sheikh_bio_content': 'الشيخ عبد الله بن عمر عالم إسلامي معروف كرس حياته لتدريس القرآن والحديث. وقد استفاد آلاف الطلاب من شروحاته الشاملة للنصوص الكلاسيكية، بما في ذلك صحيح البخاري، والشاطبية، وألفية السيوطي، ومنتقى ابن الجارود، وعلل الترمذي.',
+      'sheikh_bio_content': 'الشيخ عبد الله بن عمر عالم إسلامي معروف كرس حياته لتدريس القرآن والحديث. وقد استفاد آلاف الطلاب من شروحاته الشاملة للنصوص الكلاسيكية، بما في ذلك صحيح البخاري، والشاطبية، وملحة الإعراب، ومنتقى ابن الجارود، وعلل الترمذي.',
       'contact_sheikh': 'اتصل بالشيخ',
     },
   };

@@ -44,14 +44,6 @@ final List<Book> books = [
     lessonCount: 5,
   ),
   const Book(
-    id: 'Sulalatul-miftah',
-    title: 'Sulalatul Miftah',
-    titleAr: 'سلالة المفتاح',
-    description: 'Commentary on Sulalat al-Miftah',
-    descriptionAr: 'شرح منظومة سلالة المفتاح في أصول التفسير',
-    lessonCount: 32,
-  ),
-  const Book(
     id: 'Al-ibanah an ma\'aanilqira\'aat',
     title: 'Al-Ibanah \'an Ma\'anil Qira\'at',
     titleAr: 'الإبانة عن معاني القراءات',
@@ -60,12 +52,20 @@ final List<Book> books = [
     lessonCount: 4,
   ),
   const Book(
-    id: 'Alfiyyatus-siyudi',
-    title: 'Alfiyyatus Siyudi',
-    titleAr: 'ألفية السيوطي',
-    description: 'The Thousand-line Poem by Al-Siyuti',
-    descriptionAr: 'ألفية السيوطي في علم الحديث',
-    lessonCount: 30,
+    id: 'Mulhatul Iierab',
+    title: 'Mulhatul I\'rab',
+    titleAr: 'ملحة الإعراب',
+    description: 'Explanation of Mulhat al-I\'rab in Arabic Grammar',
+    descriptionAr: 'شرح منظومة ملحة الإعراب للحريري في علم النحو',
+    lessonCount: 36,
+  ),
+  const Book(
+    id: 'manzumatul baiquiyya',
+    title: 'Manzumatul Baiquniyyah',
+    titleAr: 'المنظومة البيقونية',
+    description: 'Explanation of Al-Bayquniyyah in Hadith Terminology',
+    descriptionAr: 'شرح المنظومة البيقونية في مصطلح الحديث',
+    lessonCount: 17,
   ),
   const Book(
     id: 'Jazariyyah',
@@ -74,14 +74,6 @@ final List<Book> books = [
     description: 'Principles of Tajweed by Ibn Al-Jazari',
     descriptionAr: 'المقدمة الجزرية في التجويد',
     lessonCount: 5,
-  ),
-  const Book(
-    id: 'Maraqis-su\'ud(0)',
-    title: 'Maraqis Su\'ud',
-    titleAr: 'مراقي السعود',
-    description: 'Ascent of Success in Usul al-Fiqh',
-    descriptionAr: 'شرح مراقي السعود',
-    lessonCount: 19,
   ),
   const Book(
     id: 'Muntaqaa-ibniljarud',
@@ -122,14 +114,6 @@ final List<Book> books = [
     description: 'The Gift for Children in Tajweed',
     descriptionAr: 'تحفة الأطفال في تجويد القرآن',
     lessonCount: 10,
-  ),
-  const Book(
-    id: 'Sulalatul miftah',
-    title: 'Sulalatul Miftah (Short)',
-    titleAr: 'سلالة المفتاح',
-    description: 'A shorter commentary on Sulalat al-Miftah',
-    descriptionAr: 'شرح منظومة سلالة المفتاح',
-    lessonCount: 3,
   ),
 ];
 
