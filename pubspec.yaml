@@ -51,6 +51,7 @@ dependencies:
   flutter_staggered_animations: ^1.1.1
   flutter_localizations:
     sdk: flutter
+  in_app_update: ^4.2.5
 
 dev_dependencies:
   flutter_test:

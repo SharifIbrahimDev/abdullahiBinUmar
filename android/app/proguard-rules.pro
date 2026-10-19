@@ -3,7 +3,8 @@
 -keep class io.flutter.plugins.** { *; }
 -dontwarn io.flutter.embedding.**
 
-# Flutter references Play Core (deferred components) which this app doesn't use
+# In-app update (Google Play Core)
+-keep class com.google.android.play.core.** { *; }
 -dontwarn com.google.android.play.core.**
 
 # Background audio (just_audio / just_audio_background / audio_service)

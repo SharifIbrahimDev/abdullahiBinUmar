@@ -11,6 +11,8 @@ import '../constants/app_colors.dart';
 import '../constants/responsive.dart';
 
 
+import '../services/update_service.dart';
+
 class BooksScreen extends StatefulWidget {
   const BooksScreen({super.key});
 
@@ -22,6 +24,14 @@ class _BooksScreenState extends State<BooksScreen> {
   String _searchQuery = "";
   bool _isSearching = false;
   final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      UpdateService.checkForUpdate();
+    });
+  }
 
   @override
   void dispose() {

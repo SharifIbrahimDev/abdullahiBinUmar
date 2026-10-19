@@ -125,4 +125,63 @@ class AppSnackbar {
       ),
     );
   }
+
+  static void showUpdateDownloaded(GlobalKey<ScaffoldMessengerState> key, VoidCallback onRestart) {
+    final state = key.currentState;
+    if (state == null) return;
+
+    state.clearSnackBars();
+    state.showSnackBar(
+      SnackBar(
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        duration: const Duration(days: 1),
+        content: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: const Color(0xFF2E7D32),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.system_update_rounded, color: Colors.white, size: 24),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Text(
+                  'Update downloaded. Restart to complete.',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  state.hideCurrentSnackBar();
+                  onRestart();
+                },
+                child: const Text(
+                  'RESTART',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        margin: const EdgeInsets.all(16),
+      ),
+    );
+  }
 }

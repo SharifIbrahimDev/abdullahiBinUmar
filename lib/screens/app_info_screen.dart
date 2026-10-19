@@ -74,9 +74,9 @@ class AppInfoScreen extends StatelessWidget {
             FutureBuilder<PackageInfo>(
               future: PackageInfo.fromPlatform(),
               builder: (context, snapshot) {
-                final ver = snapshot.hasData ? snapshot.data!.version : "1.1.0";
+                final ver = snapshot.hasData ? " ${snapshot.data!.version}" : "";
                 return Text(
-                  "${AppLocalizations.of(context).translate('version')} $ver",
+                  "${AppLocalizations.of(context).translate('version')}$ver",
                   style: GoogleFonts.inter(
                     fontSize: r.sp(14),
                     color: Colors.black38,

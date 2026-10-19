@@ -267,7 +267,7 @@ class AppDrawer extends StatelessWidget {
                 builder: (context, snapshot) {
                   final versionText = snapshot.hasData
                       ? "${AppLocalizations.of(context).translate('version')} ${snapshot.data!.version}"
-                      : "${AppLocalizations.of(context).translate('version')} 1.1.0";
+                      : AppLocalizations.of(context).translate('version');
 
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.center,
